@@ -1,8 +1,13 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:heta/page/sign_up_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:heta/config/web_config.dart';
 
+
+//这里是登录时显示的那个弹窗
 class LoginPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -11,11 +16,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool? isPasswdCorrect;
-  bool isPasswdVisible = false;
-  bool rememberMe = false;
+  bool? _isPasswdCorrect;
+  bool _isPasswdVisible = false;
+  bool _rememberMyPasswd = false;
 
-  TextEditingController _idController = TextEditingController();
+  TextEditingController _phoneNumController = TextEditingController();
   TextEditingController _passwdController = TextEditingController();
 
   @override
@@ -24,46 +29,47 @@ class _LoginPageState extends State<LoginPage> {
     _loadUserInfo();
   }
 
+  //利用SharedPreferences，加载保存的账号和密码方便用户登录
   _loadUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _idController.text = prefs.getString('username') ?? '';
-      if (prefs.getBool('rememberMe') ?? false) {
+      _phoneNumController.text = prefs.getString('phoneNum') ?? '';
+      if (prefs.getBool('_rememberMyPasswd') ?? false) {
         _passwdController.text = prefs.getString('password') ?? '';
-        rememberMe = true;
+        _rememberMyPasswd = true;
       }
     });
   }
-
+  //将这次登录的账号密码保存下来
   _saveUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('username', _idController.text);
-    prefs.setBool('rememberMe', rememberMe);
-    if (rememberMe) {
+    prefs.setString('phoneNum', _phoneNumController.text);
+    prefs.setBool('_rememberMyPasswd', _rememberMyPasswd);
+    if (_rememberMyPasswd) {
       prefs.setString('password', _passwdController.text);
     } else {
       prefs.remove('password');
     }
   }
-
-  _verifyUser(String id, String passwd) async {
-    String url = "http://8.130.12.168:8080/heta/user/verifyUser/$id/$passwd";
+  //验证用户输入的的账号密码是否与存储在数据库中的账号密码一致
+  _verifyUser(String phoneNum, String passwd) async {
+    String url = "http://"+ WebConfig.SERVER_HOST_ADDRESS +":8080/heta/user/verifyUser/$phoneNum/$passwd";
     final response = await http.get(Uri.parse(url));
     Map<String, dynamic> jsonData = jsonDecode(response.body);
     setState(() {
       if (jsonData["result"]) {
-        isPasswdCorrect = true;
+        _isPasswdCorrect = true;
         _saveUserInfo();
-        Navigator.of(context).pop(id);
+        Navigator.of(context).pop(phoneNum);
       } else {
-        isPasswdCorrect = false;
+        _isPasswdCorrect = false;
       }
     });
   }
 
   String? _getErrorText() {
-    if (isPasswdCorrect == false) {
-      return "密码或账号不正确，请重新输入！";
+    if (_isPasswdCorrect == false) {
+      return "密码或手机号不正确，请重新输入！";
     }
     return null;
   }
@@ -84,8 +90,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
           SizedBox(height: 30),
           TextField(
-            controller: _idController,
-            decoration: InputDecoration(hintText: "请输入ID..."),
+            controller: _phoneNumController,
+            decoration: InputDecoration(hintText: "请输入手机号..."),
           ),
           SizedBox(height: 30),
           TextField(
@@ -94,27 +100,26 @@ class _LoginPageState extends State<LoginPage> {
               hintText: "请输入密码...",
               errorText: _getErrorText(),
               suffixIcon: IconButton(
-                icon: isPasswdVisible
+                icon: _isPasswdVisible
                     ? Icon(Icons.visibility)
                     : Icon(Icons.visibility_off),
                 onPressed: () {
                   setState(() {
-                    isPasswdVisible = !isPasswdVisible;
+                    _isPasswdVisible = !_isPasswdVisible;
                   });
                 },
               ),
             ),
-            obscureText: !isPasswdVisible,
+            obscureText: !_isPasswdVisible,
           ),
           SizedBox(height: 10,),
           Row(
             children: [
-              // SizedBox(width: 100,),
               Checkbox(
-                value: rememberMe,
+                value: _rememberMyPasswd,
                 onChanged: (value) {
                   setState(() {
-                    rememberMe = value!;
+                    _rememberMyPasswd = value!;
                   });
                 },
               ),
@@ -128,9 +133,21 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(fontSize: 20),
             ),
             onPressed: () {
-              _verifyUser(_idController.text, _passwdController.text);
+              _verifyUser(_phoneNumController.text, _passwdController.text);
             },
           ),
+          SizedBox(height: 10,),
+          TextButton(
+            child: Text(
+              "没有账号？点我注册",
+              style: TextStyle(
+                color: CupertinoColors.activeBlue,
+              ),
+            ),
+            onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder:(context)=> SignUpPage()));
+            },
+          )
         ],
       ),
     )

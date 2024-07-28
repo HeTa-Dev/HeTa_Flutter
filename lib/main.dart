@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:heta/entity/User.dart';
+import 'package:heta/config/web_config.dart';
+import 'package:heta/entity/user.dart';
 import 'package:heta/page/administrator_home_page.dart';
 import 'package:heta/page/login_page.dart';
 import 'package:heta/page/user_home_page.dart';
 import 'package:http/http.dart' as http;
 
+
+// 这里是禾她应用程序的主入口
 void main() {
   runApp(HetaApp());
 }
@@ -32,20 +35,22 @@ class HetaMainPage extends StatefulWidget {
 }
 
 class _HetaMainPageState extends State<HetaMainPage> {
+  //_selectedIndex 用来确定底部导航栏被选中的是哪一个，也就是你现在在哪个页面
   int _selectedIndex = 0;
-  String? userId;
+  String? userPhoneNum;
 
   @override
   void initState() {
     super.initState();
+    //在进入应用前需要登录，否则无法进入应用
     WidgetsBinding.instance.addPostFrameCallback((_) => _showLoginDialog());
   }
-
+  //不登录就没法关闭这个弹窗，无法操作应用内的组件
   Future<void> _showLoginDialog() async {
     bool isAuthenticated = false;
 
     while (!isAuthenticated) {
-      userId = await showDialog<String>(
+      userPhoneNum = await showDialog<String>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
@@ -53,15 +58,16 @@ class _HetaMainPageState extends State<HetaMainPage> {
         },
       );
 
-      isAuthenticated = userId != null && userId!.isNotEmpty; // 验证是否已认证
+      isAuthenticated = userPhoneNum != null && userPhoneNum!.isNotEmpty; // 验证是否已认证
     }
 
     setState(() {});
   }
 
+  //根据登入时的手机号码获取用户信息，便于显示头像、昵称等等
   Future<User> _fetchUser() async {
-    int id = int.parse(userId!);
-    final response = await http.get(Uri.parse("http://8.130.12.168:8080/heta/user/findUserById/$id"));
+    int phoneNum = int.parse(userPhoneNum!);
+    final response = await http.get(Uri.parse("http://"+ WebConfig.SERVER_HOST_ADDRESS +":8080/heta/user/findUserByPhoneNum/$phoneNum"));
     Map<String, dynamic> jsonData = jsonDecode(response.body);
     currentUser = User.fromJson(jsonData);
     return currentUser!;
@@ -72,6 +78,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
       return FutureBuilder<User>(
         future: _fetchUser(),
         builder: (context, snapshot) {
+          //这里添加了一个转圈圈图标，表示正在加载中
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
