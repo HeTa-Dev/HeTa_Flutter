@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:heta/entity/user.dart';
+import 'package:flutter/material.dart';
 
 
 //这里是禾她注册页
@@ -116,7 +117,8 @@ class _SignUpPage extends State<SignUpPage>{
       ),
       body: Padding(
         padding: EdgeInsets.fromLTRB(20, 100, 20, 0),
-        child: Column(
+        child: SingleChildScrollView(
+         child:  Column(
           children: [
             Text(
               "欢迎加入禾她！",
@@ -184,6 +186,7 @@ class _SignUpPage extends State<SignUpPage>{
           ],
         ),
       ),
+      )
     );
   }
 }

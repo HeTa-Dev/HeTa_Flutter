@@ -5,14 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
 import 'package:heta/entity/user.dart';
 import 'package:heta/page/administrator_home_page.dart';
+import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/login_page.dart';
 import 'package:heta/page/user_home_page.dart';
+import 'package:heta/provider/user_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 
 // 这里是禾她应用程序的主入口
 void main() {
-  runApp(HetaApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: HetaApp(),
+    ),
+  );
 }
 
 User? currentUser;
@@ -84,6 +92,10 @@ class _HetaMainPageState extends State<HetaMainPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text("加载用户信息时出错！"));
           } else {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final userProvider = Provider.of<UserProvider>(context,listen: false);
+              userProvider.setUser(currentUser!);
+            });
             if (currentUser?.type == "seller" || currentUser?.type == "customer") {
               return UserHomePage();
             } else if (currentUser?.type == "administrator") {
@@ -104,19 +116,19 @@ class _HetaMainPageState extends State<HetaMainPage> {
     if (index == 0) {
       return AppBar(
         title: Text("首页"),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.lightBlue,
         centerTitle: true,
       );
     } else if (index == 2) {
       return AppBar(
         title: Text("发布页"),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.lightBlue,
         centerTitle: true,
       );
     } else {
       return AppBar(
         title: Text("页面开发中..."),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.lightBlue,
       );
     }
   }
@@ -126,23 +138,32 @@ class _HetaMainPageState extends State<HetaMainPage> {
     return Scaffold(
       appBar: _buildAppBar(_selectedIndex),
       body: _buildBody(_selectedIndex),
+      drawer: DrawerPage(),
       bottomNavigationBar: BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "搜索"),
+          BottomNavigationBarItem(
+              icon: _selectedIndex==0?Icon(Icons.home):Icon(Icons.home_outlined),
+              label: "首页"),
+          BottomNavigationBarItem(
+              icon: _selectedIndex == 1?Icon(Icons.shopping_bag):Icon(Icons.shopping_bag_outlined),
+              label: "集市"),
           BottomNavigationBarItem(
             icon: Container(
               padding: EdgeInsets.all(3),
               child: Icon(Icons.add),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: Colors.lightGreen,
+                color: Colors.blueAccent,
               ),
             ),
             label: "发布",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: "日程"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "设置"),
+          BottomNavigationBarItem(
+              icon: _selectedIndex==3?Icon(Icons.switch_account_rounded):Icon(Icons.switch_account_outlined),
+              label: "社区"),
+          BottomNavigationBarItem(
+              icon: _selectedIndex==4?Icon(Icons.chat):Icon(Icons.chat_outlined),
+              label: "消息"),
         ],
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: true,
