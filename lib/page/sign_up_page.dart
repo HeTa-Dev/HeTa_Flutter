@@ -9,9 +9,9 @@ import 'package:heta/entity/user.dart';
 import 'package:flutter/material.dart';
 
 
-//这里是禾她注册页
-//TODO：需要增加验证条件，在密码为空的时候不能允许用户注册
-//TODO：需要增加验证条件，在密码不够强的时候不能允许用户注册
+// 这里是禾她注册页
+// TODO：需要增加验证条件，在密码为空的时候不能允许用户注册
+// TODO：需要增加验证条件，在密码不够强的时候不能允许用户注册
 class SignUpPage extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
@@ -25,13 +25,13 @@ class _SignUpPage extends State<SignUpPage>{
   TextEditingController _passwdController = TextEditingController();
   TextEditingController _confirmController = TextEditingController();
   TextEditingController _typeController = TextEditingController();
-  //这个focusNode用来监视第二次输入密码的输入框
-  //每次离开输入框都更新一遍_isPasswordConfirmed
+  // 这个focusNode用来监视第二次输入密码的输入框
+  // 每次离开输入框都更新一遍_isPasswordConfirmed
   FocusNode _focusNode = FocusNode();
-  //这个focusNode用来监视手机号的输入框
-  //避免出现用户用一次重复手机号注册之后_isPhoneNumDuplicated恒为true的情况
+  // 这个focusNode用来监视手机号的输入框
+  // 避免出现用户用一次重复手机号注册之后_isPhoneNumDuplicated恒为true的情况
   FocusNode _focusNode1 =  FocusNode();
-  //TODO:这里的_typeList要等其他组的同学告知有哪些用户角色并转换成中文，为了方便先这样
+  // TODO:这里的_typeList要等其他组的同学告知有哪些用户角色并转换成中文，为了方便先这样
   List<String> _typeList = ["customer","seller","administrator"];
   bool _isPhoneNumDuplicated = false;
   bool _isPasswordConfirmed = true;
@@ -42,7 +42,7 @@ class _SignUpPage extends State<SignUpPage>{
     }).toList();
   }
 
-  //用户注册，注册的一系列条件检测也在这个方法里面
+  // 用户注册，注册的一系列条件检测也在这个方法里面
   signUpUser() async{
     User user = User(
         username: _usernameController.text,
@@ -55,13 +55,13 @@ class _SignUpPage extends State<SignUpPage>{
       body: jsonEncode(user.toJSON())
     );
     Map<String, dynamic> jsonData = jsonDecode(response.body);
-    //检测手机号是否重复
+    // 检测手机号是否重复
     if(jsonData["duplicated"] == true){
       setState(() {
         _isPhoneNumDuplicated = true;
       });
     }
-    //手机号重复或者密码前后不一致都不符合注册条件
+    // 手机号重复或者密码前后不一致都不符合注册条件
     if(!_isPasswordConfirmed||_isPhoneNumDuplicated){
       showDialog(
           context: context,
@@ -78,7 +78,7 @@ class _SignUpPage extends State<SignUpPage>{
           context: context,
           builder:(context){
             Future.delayed(Duration(seconds: 1), () {
-              //正常注册时候连续退两次Navigator，回到登录页面
+              // 正常注册时候连续退两次Navigator，回到登录页面
               Navigator.of(context).pop(true);
               Navigator.of(context).pop(true);
             });
@@ -91,7 +91,7 @@ class _SignUpPage extends State<SignUpPage>{
 
   @override
   Widget build(BuildContext context) {
-    //为focusNode添加监视
+    // 为focusNode添加监视
     _focusNode.addListener((){
       if(!_focusNode.hasFocus){
         setState(() {

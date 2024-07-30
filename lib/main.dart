@@ -43,17 +43,17 @@ class HetaMainPage extends StatefulWidget {
 }
 
 class _HetaMainPageState extends State<HetaMainPage> {
-  //_selectedIndex 用来确定底部导航栏被选中的是哪一个，也就是你现在在哪个页面
+  // _selectedIndex 用来确定底部导航栏被选中的是哪一个，也就是你现在在哪个页面
   int _selectedIndex = 0;
   String? userPhoneNum;
 
   @override
   void initState() {
     super.initState();
-    //在进入应用前需要登录，否则无法进入应用
+    // 在进入应用前需要登录，否则无法进入应用
     WidgetsBinding.instance.addPostFrameCallback((_) => _showLoginDialog());
   }
-  //不登录就没法关闭这个弹窗，无法操作应用内的组件
+  // 不登录就没法关闭这个弹窗，无法操作应用内的组件
   Future<void> _showLoginDialog() async {
     bool isAuthenticated = false;
 
@@ -72,13 +72,23 @@ class _HetaMainPageState extends State<HetaMainPage> {
     setState(() {});
   }
 
-  //根据登入时的手机号码获取用户信息，便于显示头像、昵称等等
+  // 根据登入时的手机号码获取用户信息，便于显示头像、昵称等等
   Future<User> _fetchUser() async {
     int phoneNum = int.parse(userPhoneNum!);
     final response = await http.get(Uri.parse("http://"+ WebConfig.SERVER_HOST_ADDRESS +":8080/heta/user/findUserByPhoneNum/$phoneNum"));
-    Map<String, dynamic> jsonData = jsonDecode(response.body);
+    Map<String, dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
     currentUser = User.fromJson(jsonData);
     return currentUser!;
+  }
+
+  // 获取用户详细资料，同步到UserProvider中
+  getUserDetail() async{
+    final userProvider = Provider.of<UserProvider>(context,listen: false);
+    final user = userProvider.user;
+    final response = await http.get(Uri.parse("http://"+WebConfig.SERVER_HOST_ADDRESS+":8080/heta/user/getUserDetailById/${user!.id}"));
+    Map<String,dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+    User tempUser = User.fromJson(jsonData);
+    Provider.of<UserProvider>(context,listen: false).setUser(tempUser);
   }
 
   Widget _buildBody(index) {
@@ -86,7 +96,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
       return FutureBuilder<User>(
         future: _fetchUser(),
         builder: (context, snapshot) {
-          //这里添加了一个转圈圈图标，表示正在加载中
+          // 这里添加了一个转圈圈图标，表示正在加载中
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -95,6 +105,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               final userProvider = Provider.of<UserProvider>(context,listen: false);
               userProvider.setUser(currentUser!);
+              getUserDetail();
             });
             if (currentUser?.type == "seller" || currentUser?.type == "customer") {
               return UserHomePage();

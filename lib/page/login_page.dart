@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:heta/config/web_config.dart';
 
 
-//这里是登录时显示的那个弹窗
+// 这里是登录时显示的那个弹窗
 class LoginPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     _loadUserInfo();
   }
 
-  //利用SharedPreferences，加载保存的账号和密码方便用户登录
+  // 利用SharedPreferences，加载保存的账号和密码方便用户登录
   _loadUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     });
   }
-  //将这次登录的账号密码保存下来
+  // 将这次登录的账号密码保存下来
   _saveUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('phoneNum', _phoneNumController.text);
@@ -51,11 +51,11 @@ class _LoginPageState extends State<LoginPage> {
       prefs.remove('password');
     }
   }
-  //验证用户输入的的账号密码是否与存储在数据库中的账号密码一致
+  // 验证用户输入的的账号密码是否与存储在数据库中的账号密码一致
   _verifyUser(String phoneNum, String passwd) async {
     String url = "http://"+ WebConfig.SERVER_HOST_ADDRESS +":8080/heta/user/verifyUser/$phoneNum/$passwd";
     final response = await http.get(Uri.parse(url));
-    Map<String, dynamic> jsonData = jsonDecode(response.body);
+    Map<String, dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
     setState(() {
       if (jsonData["result"]) {
         _isPasswdCorrect = true;
