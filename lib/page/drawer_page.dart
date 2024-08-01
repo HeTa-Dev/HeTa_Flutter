@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:heta/main.dart';
 import 'package:heta/page/user_detail_page.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 
 // 这是侧边栏，可以通过主页面appBar上的按钮打开,也可以直接右滑打开
 class DrawerPage extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     // 获取当前用户
@@ -97,7 +99,35 @@ class DrawerPage extends StatelessWidget {
                   Text('退出')
                 ],
               ),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('确认退出'),
+                      content: Text('你确定要退出禾她吗？'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 关闭对话框
+                          },
+                          child: Text('取消'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 关闭对话框
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(builder: (context) => HetaApp()),
+                                  (route) => false,
+                            );// 执行重启
+                          },
+                          child: Text('确认'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
             ),
           )
         ],

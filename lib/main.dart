@@ -156,8 +156,8 @@ class _HetaMainPageState extends State<HetaMainPage> {
               icon: _selectedIndex==0?Icon(Icons.home):Icon(Icons.home_outlined),
               label: "首页"),
           BottomNavigationBarItem(
-              icon: _selectedIndex == 1?Icon(Icons.shopping_bag):Icon(Icons.shopping_bag_outlined),
-              label: "集市"),
+              icon: _selectedIndex == 1?Icon(Icons.switch_account_rounded):Icon(Icons.switch_account_outlined),
+              label: "社区"),
           BottomNavigationBarItem(
             icon: Container(
               padding: EdgeInsets.all(3),
@@ -170,11 +170,11 @@ class _HetaMainPageState extends State<HetaMainPage> {
             label: "发布",
           ),
           BottomNavigationBarItem(
-              icon: _selectedIndex==3?Icon(Icons.switch_account_rounded):Icon(Icons.switch_account_outlined),
-              label: "社区"),
-          BottomNavigationBarItem(
-              icon: _selectedIndex==4?Icon(Icons.chat):Icon(Icons.chat_outlined),
+              icon: _selectedIndex==3?Icon(Icons.chat):Icon(Icons.chat_outlined),
               label: "消息"),
+          BottomNavigationBarItem(
+              icon: _selectedIndex==4?Icon(Icons.person):Icon(Icons.person_outlined),
+              label: "我的"),
         ],
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: true,

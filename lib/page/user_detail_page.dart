@@ -175,7 +175,7 @@ class _UserDetailPage extends State<UserDetailPage> {
                   Text("    ID："),
                   SizedBox(width: 10,),
                   Expanded(
-                      child: Text(user!.id.toString())
+                      child: Text(user.id.toString())
                   )
                 ],
               ),
