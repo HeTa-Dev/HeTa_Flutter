@@ -1,6 +1,7 @@
 class OrderView{
   int? id;
   int sellerId;
+  String sellerName;
   String title;
   String text;
   double price;
@@ -11,6 +12,7 @@ class OrderView{
   OrderView({
     required this.sellerId,required this.title,required this.text,
     required this.price, required this.coverImagePath,required this.tagList,
+    required this.sellerName,
     this.id,this.imagePathList});
 
 
@@ -19,6 +21,7 @@ class OrderView{
     return {
       "id": id,
       "sellerId": sellerId,
+      "sellerName": sellerName,
       "title": title,
       "text": text,
       "price": price,
@@ -33,11 +36,12 @@ class OrderView{
     return OrderView(
       id: json["id"],
       sellerId: json["sellerId"],
+      sellerName: json["sellerName"],
       title: json["title"],
       text: json["text"],
       price: json["price"],
       coverImagePath: json["coverImagePath"],
-      imagePathList: List<String>.from(json["imagePathList"] ?? []),
+      imagePathList: List<String>.from(json["imagePathList"]),
       tagList: List<String>.from(json["tagList"]),
     );
   }

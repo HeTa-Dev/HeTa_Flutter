@@ -12,6 +12,8 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 import '../entity/order_view.dart';
 import '../provider/user_provider.dart';
 
+
+// 这里是用户进入app后的主页面，显示市场上的各种交易
 class UserHomePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -49,7 +51,6 @@ class _UserHomePage extends State<UserHomePage> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context,listen: false);
     final user = userProvider.user;
-    // 当 orderViewList 为空时显示一个加载指示器
     if (orderViewList == null) {
       return Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -60,7 +61,8 @@ class _UserHomePage extends State<UserHomePage> {
             children: [
               RefreshIndicator(
                 onRefresh: _getOrderView,
-                child: WaterfallFlow.builder(
+                child:
+                WaterfallFlow.builder(
                 padding: EdgeInsets.all(10),
                 gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, // 控制列的数量
@@ -69,7 +71,7 @@ class _UserHomePage extends State<UserHomePage> {
                 ),
                   itemCount: orderViewList?.length,
                   itemBuilder: (BuildContext context, int index){
-                  return OrderViewContainer(orderView: orderViewList![index]);
+                    return OrderViewContainer(orderView: orderViewList![index]);
                   },
                 ),
               ),

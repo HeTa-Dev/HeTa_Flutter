@@ -12,6 +12,13 @@ import 'package:heta/provider/user_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
+/*
+ 一些开发过程中总结的经验：
+  1.不要把异步方法放到任何widget的build方法里面，这样很容易会导致build无限重复调用。
+    这里的异步方法包括但不限于各种http请求，用async关键字修饰
+  2.如果你在一个方法里面调用了两条或多条异步方法，那么你最好把这个方法也用async关键字修饰，
+    并在你调用的异步方法前面加上await关键字，否则它们执行的顺序将和你的预期不符
+*/
 
 // 这里是禾她应用程序的主入口
 void main() {

@@ -12,6 +12,10 @@ import 'package:provider/provider.dart';
 import '../config/web_config.dart';
 import '../provider/user_provider.dart';
 
+// 这是新交易发布的界面
+// 只有type为Seller的用户才可以进入这个页面
+// 入口在主页面右下方的一个Icon(Icons.border_color)
+// 只有上述用户的界面里面才有这个Icon
 class NewOrderViewPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -27,8 +31,10 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
   TextEditingController _priceController = TextEditingController();
   List<String> _typeList = ["毛娘","委托","约拍","道具制作","约妆"];
   List<String> _selectedList = [];
-  bool _isLoading = false; // New state variable for loading indicator
+  bool _isLoading = false; // 方便显示加载中图标
 
+  // 这是用来从手机相册中选择图片，目前一次只能添加一张
+  // TODO：将来可以考虑实现一次性添加多张图片的功能
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -41,6 +47,7 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
     });
   }
 
+  // 上传图片到OSS服务器中，返回路径
   Future<String?> _uploadImage(File _image) async {
     final uri = Uri.parse(
         "http://" + WebConfig.SERVER_HOST_ADDRESS + ":8080/heta/oss/upload");
@@ -50,16 +57,17 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
     var response = await request.send();
 
     if (response.statusCode == 200) {
-      var newAvatarPath = await response.stream.bytesToString();
-      return newAvatarPath;
+      var newImagePath = await response.stream.bytesToString();
+      return newImagePath;
     } else {
       return null;
     }
   }
 
+
   Future<void> _addNewOrderView() async {
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true; //显示加载图标
     });
 
     List<String> imagePath = [];
@@ -75,7 +83,8 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
     final user = userProvider.user;
 
     OrderView orderView = OrderView(
-      sellerId: user?.id ?? 0,
+      sellerName: user!.username,
+      sellerId: user.id ?? 0,
       title: _titleController.text,
       text: _textController.text,
       price: double.parse(_priceController.text),
@@ -91,7 +100,7 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
     );
 
     setState(() {
-      _isLoading = false; // Hide loading indicator
+      _isLoading = false; //上传完成，隐藏加载图标
     });
 
     if (response1.statusCode == 200) {
@@ -121,20 +130,21 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
     }
   }
 
+  // 显示图片预览，也就是点击图片可以查看放大的图片，同时放大过的图片也可以用手指再次缩放
   void _showImagePreview(File image) {
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.black,
-          insetPadding: EdgeInsets.zero, // Remove padding
+          insetPadding: EdgeInsets.zero,
           child: Container(
-            width: double.infinity, // Set width to full screen
-            height: double.infinity, // Set height to full screen
+            width: double.infinity,
+            height: double.infinity,
             child: InteractiveViewer(
               child: Image.file(
                 image,
-                fit: BoxFit.contain, // Adjust image to fit screen
+                fit: BoxFit.contain,
               ),
             ),
           ),
@@ -282,7 +292,7 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
               ),
             ),
           ),
-          if (_isLoading) // Show progress indicator if loading
+          if (_isLoading)
             Center(
               child: CircularProgressIndicator(),
             ),

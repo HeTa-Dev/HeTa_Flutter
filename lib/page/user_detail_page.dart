@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 
 import '../entity/user.dart';
 
+// 这里时用户个人资料详情页兼修改页
+// 注意：这里不是用户的个人主页，这里的功能更多是修改
 class UserDetailPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -82,6 +84,7 @@ class _UserDetailPage extends State<UserDetailPage> {
       }
     }
   }
+
 
   Future<void> updateUserInfo() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -169,6 +172,8 @@ class _UserDetailPage extends State<UserDetailPage> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.user!;
 
+    // 这里需要在initSate方法里面初始化这些Controller
+    // 不可以放到build里，因为每次从相册选图片都会重新setState，你之前辛辛苦苦填的东西就没了
     _usernameController = TextEditingController(text: user.username);
     _ageController = TextEditingController(text: user.age.toString());
     _addressController = TextEditingController(text: user.address ?? "");
@@ -265,6 +270,7 @@ class _UserDetailPage extends State<UserDetailPage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                // 注意：这里的用法可以参考main.dart中的开发经验第1条
                 onPressed: () async {
                   _showLoadingDialog(context); // 显示加载弹窗
                   await uploadAvatar(_image);
