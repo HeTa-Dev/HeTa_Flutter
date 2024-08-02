@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -24,6 +25,8 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _textController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
+  List<String> _typeList = ["毛娘","委托","约拍","道具制作","约妆"];
+  List<String> _selectedList = [];
   bool _isLoading = false; // New state variable for loading indicator
 
   Future pickImage() async {
@@ -60,8 +63,8 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
     });
 
     List<String> imagePath = [];
-    for (File _image in _images) {
-      // 等待 _uploadImage 的结果
+    for (int i = 0; i < _images.length; i++) {
+      File _image = _images[i];
       String? uploadedImagePath = await _uploadImage(_image);
       if (uploadedImagePath != null) {
         imagePath.add(uploadedImagePath); // 将路径添加到列表中
@@ -70,14 +73,15 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.user;
+
     OrderView orderView = OrderView(
-        sellerId: user?.id??0,
-        title: _titleController.text,
-        text: _textController.text,
-        price: double.parse(_priceController.text),
-        coverImagePath: imagePath[0],
-        tagList: ["数码"],
-        imagePathList: imagePath
+      sellerId: user?.id ?? 0,
+      title: _titleController.text,
+      text: _textController.text,
+      price: double.parse(_priceController.text),
+      coverImagePath: imagePath[0],
+      tagList: _selectedList,
+      imagePathList: imagePath,
     );
 
     final response1 = await http.post(
@@ -115,6 +119,28 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
             );
           });
     }
+  }
+
+  void _showImagePreview(File image) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero, // Remove padding
+          child: Container(
+            width: double.infinity, // Set width to full screen
+            height: double.infinity, // Set height to full screen
+            child: InteractiveViewer(
+              child: Image.file(
+                image,
+                fit: BoxFit.contain, // Adjust image to fit screen
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -171,11 +197,17 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
                         } else {
                           return Padding(
                             padding: const EdgeInsets.only(right: 10),
-                            child: ClipRRect(
-                              child: Image.file(
-                                _images[index],
+                            child: GestureDetector(
+                              onTap: () => _showImagePreview(_images[index]),
+                              child: ClipRRect(
+                                child: Image.file(
+                                  _images[index],
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              borderRadius: BorderRadius.circular(8),
                             ),
                           );
                         }
@@ -206,6 +238,31 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
                       hintText: "预期价格...",
                     ),
                   ),
+                  SizedBox(height: 20,),
+
+                  SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _typeList.length,
+                      itemBuilder: (context,index){
+                        return Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                            child:   OutlinedButton(
+                            onPressed: (){
+                              setState(() {
+                                _textController.text += "#${_typeList[index]}";
+                                _selectedList.add(_typeList[index]);
+                                _typeList.remove(_typeList[index]);
+                              });
+                            },
+                            child: Text(_typeList[index])
+                        )
+                        );
+                      }
+                      ),
+                  ),
+                  SizedBox(height: 20,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

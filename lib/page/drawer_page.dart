@@ -32,7 +32,7 @@ class DrawerPage extends StatelessWidget {
                       backgroundImage: NetworkImage(
                         //TODO：把这里的默认路径用OSS中的一张图片替换
                         user?.avatarPath ??
-                            "https://pic.imgdb.cn/item/66a74973d9c307b7e9f02d7f.jpg",
+                            "https://heta-images.oss-cn-shanghai.aliyuncs.com/36975dfe-ab68-4c50-ae00-f4b9d4a0edbb-1000103128.webp",
                       ),
                     ),
                     SizedBox(width: 16),
