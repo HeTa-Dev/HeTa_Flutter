@@ -36,6 +36,9 @@ dependencies:
   image_picker: ^1.1.2
   cached_network_image: ^3.3.1
   waterfall_flow: ^3.0.3
+  flutter_image_compress: ^2.3.0
+  transparent_image: ^2.0.1
+  image: ^4.2.0
 
 
   # The following adds the Cupertino Icons font to your application.

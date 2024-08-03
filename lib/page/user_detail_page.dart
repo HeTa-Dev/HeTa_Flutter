@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:heta/config/web_config.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,15 +32,31 @@ class _UserDetailPage extends State<UserDetailPage> {
   // 在手机相册中选择要上传的头像图片
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
+    if (pickedFile != null) {
+      File compressedImage = await compressToWebP(File(pickedFile.path));
+      setState(() {
+        _image = compressedImage;
+      });
+    } else {
+      print('No image selected.');
+    }
   }
+  Future<File> compressToWebP(File file) async {
+    final outputFilePath = file.absolute.path + "_compressed.webp";
+    final XFile? compressedImage = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      outputFilePath,
+      format: CompressFormat.webp,
+      quality: 50,
+    );
+
+    if (compressedImage != null) {
+      return File(compressedImage.path);
+    } else {
+      throw Exception("Image compression failed.");
+    }
+  }
+
 
   Future<void> uploadAvatar(File? image) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -198,9 +215,7 @@ class _UserDetailPage extends State<UserDetailPage> {
               CircleAvatar(
                 radius: 60,
                 backgroundImage: NetworkImage(
-                  user?.avatarPath ??
-                      "https://heta-images.oss-cn-shanghai.aliyuncs.com/36975dfe-ab68-4c50-ae00-f4b9d4a0edbb-1000103128.webp",
-                ),
+                  user?.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
               ),
               _image == null ? Text("") : Image.file(_image!),
               TextButton(
@@ -270,7 +285,7 @@ class _UserDetailPage extends State<UserDetailPage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                // 注意：这里的用法可以参考main.dart中的开发经验第1条
+                // 注意：这里的用法可以参考main.dart中的开发经验第2条
                 onPressed: () async {
                   _showLoadingDialog(context); // 显示加载弹窗
                   await uploadAvatar(_image);

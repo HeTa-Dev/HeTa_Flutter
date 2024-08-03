@@ -54,9 +54,7 @@ class _OrderViewDetailPageState extends State<OrderViewDetailPage> {
           children: [
             CircleAvatar(
               backgroundImage: NetworkImage(
-                seller!.avatarPath ??
-                    "https://heta-images.oss-cn-shanghai.aliyuncs.com/36975dfe-ab68-4c50-ae00-f4b9d4a0edbb-1000103128.webp",
-              ),
+                seller!.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
             ),
             SizedBox(width: 10),
             Text(seller!.username,
@@ -170,9 +168,12 @@ class FullScreenImagePage extends StatelessWidget {
           panEnabled: true,
           minScale: 0.5,
           maxScale: 4.0,
-          child: Image.network(
-            imageUrl,
-            fit: BoxFit.contain,
+          child: AspectRatio(
+            aspectRatio: 0.6,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),

@@ -4,10 +4,12 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:heta/entity/order_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:image/image.dart' as img;
 
 import '../config/web_config.dart';
 import '../provider/user_provider.dart';
@@ -29,7 +31,7 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _textController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
-  List<String> _typeList = ["毛娘","委托","约拍","道具制作","约妆"];
+  List<String> _typeList = ["毛娘", "委托", "约拍", "道具制作", "约妆"];
   List<String> _selectedList = [];
   bool _isLoading = false; // 方便显示加载中图标
 
@@ -38,13 +40,31 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    setState(() {
-      if (pickedFile != null) {
-        _images.add(File(pickedFile.path)); // 添加选中的图片
-      } else {
-        print('No image selected.');
-      }
-    });
+    if (pickedFile != null) {
+      File compressedImage = await compressToWebP(File(pickedFile.path));
+      setState(() {
+        _images.add(compressedImage);
+      });
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  Future<File> compressToWebP(File file) async {
+    final outputFilePath = file.absolute.path + "_compressed.webp";
+    final XFile? compressedImage =
+        await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      outputFilePath,
+      format: CompressFormat.webp,
+      quality: 50,
+    );
+
+    if (compressedImage != null) {
+      return File(compressedImage.path);
+    } else {
+      throw Exception("Image compression failed.");
+    }
   }
 
   // 上传图片到OSS服务器中，返回路径
@@ -64,7 +84,6 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
     }
   }
 
-
   Future<void> _addNewOrderView() async {
     setState(() {
       _isLoading = true; //显示加载图标
@@ -79,57 +98,62 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
       }
     }
 
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.user;
+    // 获取封面图片的尺寸
+    final imageBytes = await _images[0].readAsBytes();
+    final decodedImage = img.decodeImage(imageBytes);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final user = userProvider.user;
 
-    OrderView orderView = OrderView(
-      sellerName: user!.username,
-      sellerId: user.id ?? 0,
-      title: _titleController.text,
-      text: _textController.text,
-      price: double.parse(_priceController.text),
-      coverImagePath: imagePath[0],
-      tagList: _selectedList,
-      imagePathList: imagePath,
-    );
+      OrderView orderView = OrderView(
+        sellerName: user!.username,
+        sellerId: user.id ?? 0,
+        title: _titleController.text,
+        text: _textController.text,
+        price: double.parse(_priceController.text),
+        coverImagePath: imagePath[0],
+        tagList: _selectedList,
+        imagePathList: imagePath,
+        coverWidth: decodedImage?.width,
+        coverHeight: decodedImage?.height
+      );
 
-    final response1 = await http.post(
-        Uri.parse("http://" + WebConfig.SERVER_HOST_ADDRESS + ":8080/heta/orderView/addNewOrderView"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(orderView.toJSON())
-    );
+      final response1 = await http.post(
+          Uri.parse("http://" +
+              WebConfig.SERVER_HOST_ADDRESS +
+              ":8080/heta/orderView/addNewOrderView"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(orderView.toJSON()));
 
-    setState(() {
-      _isLoading = false; //上传完成，隐藏加载图标
-    });
+      setState(() {
+        _isLoading = false; //上传完成，隐藏加载图标
+      });
 
-    if (response1.statusCode == 200) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            Future.delayed(Duration(seconds: 1), () {
-              Navigator.of(context).pop(true);
-              Navigator.of(context).pop(true);
+      if (response1.statusCode == 200) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              Future.delayed(Duration(seconds: 1), () {
+                Navigator.of(context).pop(true);
+                Navigator.of(context).pop(true);
+              });
+              return AlertDialog(
+                content: Text("发布成功！"),
+              );
             });
-            return AlertDialog(
-              content: Text("发布成功！"),
-            );
-          });
-    } else {
-      showDialog(
-          context: context,
-          builder: (context) {
-            Future.delayed(Duration(seconds: 1), () {
-              Navigator.of(context).pop(true);
-            });
-            return AlertDialog(
-              content: Text('''发布失败！
+      } else {
+        showDialog(
+            context: context,
+            builder: (context) {
+              Future.delayed(Duration(seconds: 1), () {
+                Navigator.of(context).pop(true);
+              });
+              return AlertDialog(
+                content: Text('''发布失败！
                                错误码：${response1.statusCode}'''),
-            );
-          });
+              );
+            });
+      }
     }
-  }
-
   // 显示图片预览，也就是点击图片可以查看放大的图片，同时放大过的图片也可以用手指再次缩放
   void _showImagePreview(File image) {
     showDialog(
@@ -248,31 +272,32 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
                       hintText: "预期价格...",
                     ),
                   ),
-                  SizedBox(height: 20,),
-
+                  SizedBox(
+                    height: 20,
+                  ),
                   SizedBox(
                     height: 40,
                     child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _typeList.length,
-                      itemBuilder: (context,index){
-                        return Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                            child:   OutlinedButton(
-                            onPressed: (){
-                              setState(() {
-                                _textController.text += "#${_typeList[index]}";
-                                _selectedList.add(_typeList[index]);
-                                _typeList.remove(_typeList[index]);
-                              });
-                            },
-                            child: Text(_typeList[index])
-                        )
-                        );
-                      }
-                      ),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _typeList.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                              child: OutlinedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _textController.text +=
+                                          "#${_typeList[index]}";
+                                      _selectedList.add(_typeList[index]);
+                                      _typeList.remove(_typeList[index]);
+                                    });
+                                  },
+                                  child: Text(_typeList[index])));
+                        }),
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

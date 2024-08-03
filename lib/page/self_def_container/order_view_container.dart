@@ -36,39 +36,6 @@ class _OrderViewContainer extends State<OrderViewContainer> with AutomaticKeepAl
         Navigator.push(context, MaterialPageRoute(builder:(context)=>OrderViewDetailPage(orderView: widget.orderView)));
       },
       child: Container(
-        padding: EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: CachedNetworkImage(
-                imageUrl: widget.orderView.coverImagePath,
-                placeholder: (context, url) => Center(child: CircularProgressIndicator(),),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              widget.orderView.title,
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              "\¥${widget.orderView.price.toStringAsFixed(2)}",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              widget.orderView.sellerName,
-              style: TextStyle(fontSize: 10),
-            )
-          ],
-        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
@@ -80,7 +47,64 @@ class _OrderViewContainer extends State<OrderViewContainer> with AutomaticKeepAl
             ),
           ],
         ),
-      ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+                bottomLeft: Radius.zero,
+                bottomRight: Radius.zero,
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double width = constraints.maxWidth; // 获取容器的宽度
+                  double height = width*(widget.orderView.coverHeight!/widget.orderView.coverWidth!);
+
+                  return Container(
+                    height: height, // 使用计算后的高度
+                    child: CachedNetworkImage(
+                      imageUrl: widget.orderView.coverImagePath,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[200],
+                      ),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(5), // 为ClipRRect外的元素设置边距
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.orderView.title,
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    "\¥${widget.orderView.price.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    widget.orderView.sellerName,
+                    style: TextStyle(fontSize: 10),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      )
     );
   }
 }

@@ -81,9 +81,14 @@ class _UserHomePage extends State<UserHomePage> {
                   bottom: 20,
                   child: FloatingActionButton(
                     onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(
-                          builder:(context)=> NewOrderViewPage())
-                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NewOrderViewPage()),
+                      ).then((value) {
+                        if (value == true) {
+                          _getOrderView(); // 当从 NewOrderViewPage 返回，并且发布成功时刷新订单视图
+                        }
+                      });
                     },
                     child: Icon(Icons.border_color),
                     shape: CircleBorder(),

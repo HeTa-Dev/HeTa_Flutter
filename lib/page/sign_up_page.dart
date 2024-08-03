@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'package:heta/config/web_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:heta/entity/user.dart';
-import 'package:flutter/material.dart';
 
 
 // 这里是禾她注册页

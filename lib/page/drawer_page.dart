@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:heta/config/web_config.dart';
 import 'package:heta/main.dart';
 import 'package:heta/page/user_detail_page.dart';
 import 'package:heta/provider/user_provider.dart';
@@ -30,9 +31,7 @@ class DrawerPage extends StatelessWidget {
                     CircleAvatar(
                       radius: 40,
                       backgroundImage: NetworkImage(
-                        //TODO：把这里的默认路径用OSS中的一张图片替换
-                        user?.avatarPath ??
-                            "https://heta-images.oss-cn-shanghai.aliyuncs.com/36975dfe-ab68-4c50-ae00-f4b9d4a0edbb-1000103128.webp",
+                        user?.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH,
                       ),
                     ),
                     SizedBox(width: 16),

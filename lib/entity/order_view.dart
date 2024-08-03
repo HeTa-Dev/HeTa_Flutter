@@ -8,15 +8,16 @@ class OrderView{
   String coverImagePath;
   List<String> ?imagePathList;
   List<String> tagList;
+  int? coverHeight;
+  int? coverWidth;
 
   OrderView({
     required this.sellerId,required this.title,required this.text,
     required this.price, required this.coverImagePath,required this.tagList,
     required this.sellerName,
-    this.id,this.imagePathList});
+    this.id,this.imagePathList,this.coverHeight, this.coverWidth});
 
 
-  // toJSON method to convert OrderView instance to JSON
   Map<String, dynamic> toJSON() {
     return {
       "id": id,
@@ -28,10 +29,11 @@ class OrderView{
       "coverImagePath": coverImagePath,
       "imagePathList": imagePathList,
       "tagList": tagList,
+      "coverHeight":coverHeight,
+      "coverWidth":coverWidth,
     };
   }
 
-  // fromJSON method to create OrderView instance from JSON
   factory OrderView.fromJSON(Map<String, dynamic> json) {
     return OrderView(
       id: json["id"],
@@ -43,6 +45,8 @@ class OrderView{
       coverImagePath: json["coverImagePath"],
       imagePathList: List<String>.from(json["imagePathList"]),
       tagList: List<String>.from(json["tagList"]),
+      coverHeight: json["coverHeight"],
+      coverWidth: json["coverWidth"]
     );
   }
 }
