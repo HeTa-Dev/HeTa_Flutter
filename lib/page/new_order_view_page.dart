@@ -122,7 +122,7 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
               WebConfig.SERVER_HOST_ADDRESS +
               ":8080/heta/orderView/addNewOrderView"),
           headers: {"Content-Type": "application/json"},
-          body: jsonEncode(orderView.toJSON()));
+          body: jsonEncode(orderView.toJson()));
 
       setState(() {
         _isLoading = false; //上传完成，隐藏加载图标

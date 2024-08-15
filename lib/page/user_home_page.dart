@@ -34,7 +34,7 @@ class _UserHomePage extends State<UserHomePage> {
       setState(() {
         // 将 JSON 列表解析为 List<OrderView>
         orderViewList =
-            jsonData.map((item) => OrderView.fromJSON(item)).toList();
+            jsonData.map((item) => OrderView.fromJson(item)).toList();
       });
     } else {
       throw Exception('Failed to load posts');
@@ -49,8 +49,11 @@ class _UserHomePage extends State<UserHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // 提前加载侧边栏背景图片
+    precacheImage(NetworkImage("https://heta-images.oss-cn-shanghai.aliyuncs.com/1686646960611188.webp"), context);
     final userProvider = Provider.of<UserProvider>(context,listen: false);
     final user = userProvider.user;
+    precacheImage(NetworkImage(user?.avatarPath??WebConfig.DEFAULT_IMAGE_PATH), context);
     if (orderViewList == null) {
       return Scaffold(
         body: Center(child: CircularProgressIndicator()),

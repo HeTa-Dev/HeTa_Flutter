@@ -49,7 +49,9 @@ class _OrderViewDetailPageState extends State<OrderViewDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: seller == null
-            ? CircularProgressIndicator() // 如果 seller 为空，显示加载指示器
+            ? CircularProgressIndicator(
+            strokeWidth: 2.5,
+        ) // 如果 seller 为空，显示加载指示器
             : Row(
           children: [
             CircleAvatar(

@@ -18,7 +18,7 @@ class OrderView{
     this.id,this.imagePathList,this.coverHeight, this.coverWidth});
 
 
-  Map<String, dynamic> toJSON() {
+  Map<String, dynamic> toJson() {
     return {
       "id": id,
       "sellerId": sellerId,
@@ -34,7 +34,7 @@ class OrderView{
     };
   }
 
-  factory OrderView.fromJSON(Map<String, dynamic> json) {
+  factory OrderView.fromJson(Map<String, dynamic> json) {
     return OrderView(
       id: json["id"],
       sellerId: json["sellerId"],

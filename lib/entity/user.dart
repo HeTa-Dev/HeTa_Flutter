@@ -27,7 +27,7 @@ class User{
     );
   }
 
-  Map<String,dynamic> toJSON(){
+  Map<String,dynamic> toJson(){
     return{
       "username":username,
       "id":id,

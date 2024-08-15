@@ -23,6 +23,8 @@ class OrderViewContainer extends StatefulWidget {
 // 本来UI在build的时候就会有伸缩。这样会给用户带来很不好的体验
 // 所以这里我们告诉flutter框架不要清理这个自定义Container。
 // 最终效果就是页面只会在刚进入的时候伸缩一次，用户体验好了很多，但也会占用更多内存。
+// 2024.8.3 最新情况：占位符已经实现了根据图片尺寸自适应，
+// 但这里不打算改了，因为不改的话用户体验更好
 class _OrderViewContainer extends State<OrderViewContainer> with AutomaticKeepAliveClientMixin<OrderViewContainer> {
   @override
   bool get wantKeepAlive => true;

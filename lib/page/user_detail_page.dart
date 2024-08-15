@@ -127,7 +127,7 @@ class _UserDetailPage extends State<UserDetailPage> {
       Uri.parse(
           "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/user/updateUser"),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode(tempUser.toJSON()),
+      body: jsonEncode(tempUser.toJson()),
     );
     print("更新了用户信息！");
 

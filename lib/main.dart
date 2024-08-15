@@ -7,6 +7,7 @@ import 'package:heta/entity/user.dart';
 import 'package:heta/page/administrator_home_page.dart';
 import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/login_page.dart';
+import 'package:heta/page/realtime_chat_page.dart';
 import 'package:heta/page/user_home_page.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:http/http.dart' as http;
@@ -18,6 +19,9 @@ import 'package:provider/provider.dart';
     这里的异步方法包括但不限于各种http请求，用async关键字修饰
   2.如果你在一个方法里面调用了两条或多条异步方法，那么你最好把这个方法也用async关键字修饰，
     并在你调用的异步方法前面加上await关键字，否则它们执行的顺序将和你的预期不符
+  3.使用preCacheImage预加载了一张图片之后，再次调用这张图片的时候不要用CachedNetworkImage,
+    否则有可能白白预加载了，它会又一次重新访问这张图片并把它加载到内存中去
+    使用NetworkImage即可
 */
 
 // 这里是禾她应用程序的主入口
@@ -123,7 +127,10 @@ class _HetaMainPageState extends State<HetaMainPage> {
           }
         },
       );
-    } else {
+    } else if(index == 3){
+      return RealtimeChatPage();
+    } else
+   {
       return Center(
         child: Text("该页面尚未搭建完成"),
       );
@@ -134,19 +141,22 @@ class _HetaMainPageState extends State<HetaMainPage> {
     if (index == 0) {
       return AppBar(
         title: Text("首页"),
-        backgroundColor: Colors.lightBlue,
         centerTitle: true,
       );
     } else if (index == 2) {
       return AppBar(
         title: Text("发布页"),
-        backgroundColor: Colors.lightBlue,
         centerTitle: true,
       );
-    } else {
+    }else if(index == 3){
+      return AppBar(
+        title: Text("聊天页"),
+        centerTitle: true,
+      );
+    }
+    else {
       return AppBar(
         title: Text("页面开发中..."),
-        backgroundColor: Colors.lightBlue,
       );
     }
   }

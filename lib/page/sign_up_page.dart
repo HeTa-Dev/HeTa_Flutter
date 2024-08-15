@@ -50,7 +50,7 @@ class _SignUpPage extends State<SignUpPage>{
     final response = await http.post(
       Uri.parse("http://"+WebConfig.SERVER_HOST_ADDRESS+":8080/heta/user/addNewUser"),
       headers: {"Content-Type":"application/json"},
-      body: jsonEncode(user.toJSON())
+      body: jsonEncode(user.toJson())
     );
     Map<String, dynamic> jsonData = jsonDecode(response.body);
     // 检测手机号是否重复

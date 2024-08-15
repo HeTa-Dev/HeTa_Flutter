@@ -1,4 +1,5 @@
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
@@ -60,7 +61,10 @@ class DrawerPage extends StatelessWidget {
                   ],
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.lightBlue,
+                  image: DecorationImage(
+                    image: NetworkImage("https://heta-images.oss-cn-shanghai.aliyuncs.com/1686646960611188.webp"),
+                    fit: BoxFit.cover
+                  )
                 ),
               ),
               Expanded(
