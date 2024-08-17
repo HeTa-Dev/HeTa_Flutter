@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// 这是自定义的聊天气泡
 class ChatBubble extends StatelessWidget {
   final String message;
   final String senderName;
@@ -33,10 +34,12 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
         ),
+        // 如果是自己发的消息，那么就显示在屏幕右侧，蓝底白字，气泡右下为尖角
+        // 如果不是自己发的消息，那么就显示在屏幕左侧，灰底黑字，气泡坐下为尖角
         Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             decoration: BoxDecoration(
               color: isMe ? Colors.blue : Colors.grey[300],

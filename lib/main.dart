@@ -10,6 +10,7 @@ import 'package:heta/page/login_page.dart';
 import 'package:heta/page/realtime_chat_page.dart';
 import 'package:heta/page/user_home_page.dart';
 import 'package:heta/provider/user_provider.dart';
+import 'package:heta/provider/web_socket_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
@@ -27,11 +28,15 @@ import 'package:provider/provider.dart';
 // 这里是禾她应用程序的主入口
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => UserProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => WebSocketProvider()),
+      ],
       child: HetaApp(),
     ),
   );
+
 }
 
 User? currentUser;
@@ -167,40 +172,74 @@ class _HetaMainPageState extends State<HetaMainPage> {
       appBar: _buildAppBar(_selectedIndex),
       body: _buildBody(_selectedIndex),
       drawer: DrawerPage(),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-              icon: _selectedIndex==0?Icon(Icons.home):Icon(Icons.home_outlined),
-              label: "首页"),
-          BottomNavigationBarItem(
-              icon: _selectedIndex == 1?Icon(Icons.switch_account_rounded):Icon(Icons.switch_account_outlined),
-              label: "社区"),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: EdgeInsets.all(3),
-              child: Icon(Icons.add),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.blueAccent,
+      bottomNavigationBar: Consumer<WebSocketProvider>(
+        builder: (context, webSocketProvider, child) {
+          return BottomNavigationBar(
+            items: [
+              BottomNavigationBarItem(
+                  icon: _selectedIndex == 0 ? Icon(Icons.home) : Icon(Icons.home_outlined),
+                  label: "首页"),
+              BottomNavigationBarItem(
+                  icon: _selectedIndex == 1 ? Icon(Icons.switch_account_rounded) : Icon(Icons.switch_account_outlined),
+                  label: "社区"),
+              BottomNavigationBarItem(
+                icon: Container(
+                  padding: EdgeInsets.all(3),
+                  child: Icon(Icons.add),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                label: "发布",
               ),
-            ),
-            label: "发布",
-          ),
-          BottomNavigationBarItem(
-              icon: _selectedIndex==3?Icon(Icons.chat):Icon(Icons.chat_outlined),
-              label: "消息"),
-          BottomNavigationBarItem(
-              icon: _selectedIndex==4?Icon(Icons.person):Icon(Icons.person_outlined),
-              label: "我的"),
-        ],
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: true,
-        showUnselectedLabels: false,
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+              BottomNavigationBarItem(
+                icon: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (webSocketProvider.unreadCount > 0)
+                      Container(
+                        margin: EdgeInsets.only(left: 15), // 设置红点与图标之间的间距
+                        padding: EdgeInsets.all(0),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 14,
+                          minHeight: 14,
+                        ),
+                        child: Text(
+                          '${webSocketProvider.unreadCount}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    _selectedIndex == 3 ? Icon(Icons.chat) : Icon(Icons.chat_outlined),
+                  ],
+                ),
+                label: "消息",
+              ),
+              BottomNavigationBarItem(
+                  icon: _selectedIndex == 4 ? Icon(Icons.person) : Icon(Icons.person_outlined),
+                  label: "我的"),
+            ],
+            type: BottomNavigationBarType.fixed,
+            showSelectedLabels: true,
+            showUnselectedLabels: false,
+            currentIndex: _selectedIndex,
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+                if (index == 3) {
+                  Provider.of<WebSocketProvider>(context, listen: false).clearUnreadCount(); // 清除未读消息计数
+                }
+              });
+            },
+          );
         },
       ),
     );

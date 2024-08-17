@@ -11,6 +11,7 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 
 import '../entity/order_view.dart';
 import '../provider/user_provider.dart';
+import '../provider/web_socket_provider.dart';
 
 
 // 这里是用户进入app后的主页面，显示市场上的各种交易
@@ -54,6 +55,7 @@ class _UserHomePage extends State<UserHomePage> {
     final userProvider = Provider.of<UserProvider>(context,listen: false);
     final user = userProvider.user;
     precacheImage(NetworkImage(user?.avatarPath??WebConfig.DEFAULT_IMAGE_PATH), context);
+
     if (orderViewList == null) {
       return Scaffold(
         body: Center(child: CircularProgressIndicator()),
