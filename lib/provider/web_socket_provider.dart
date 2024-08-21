@@ -49,7 +49,7 @@ class WebSocketProvider with ChangeNotifier {
     notifyListeners();
 
     final response = await http.get(Uri.parse(
-        'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/messages/history?offset=${_page * _pageSize}&limit=$_pageSize'));
+        'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/messages/history?offset=${_page * _pageSize}&limit=$_pageSize'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));

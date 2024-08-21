@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heta/config/web_config.dart';
 import 'package:provider/provider.dart';
 import '../entity/message.dart';
 import '../provider/user_provider.dart';
@@ -17,7 +18,6 @@ class RealtimeChatPage extends StatefulWidget {
 
 class _RealtimeChatPageState extends State<RealtimeChatPage> {
   final TextEditingController _messageController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -33,7 +33,6 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
     final webSocketProvider = Provider.of<WebSocketProvider>(context);
     final user = userProvider.user;
     final messages = webSocketProvider.messages;
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -69,6 +68,7 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
                     message: message.content,
                     isMe: message.senderId == user?.id,
                     senderName: message.senderName,
+                    avatarPath: message.senderAvatarPath,
                   );
                 },
               ),
@@ -110,6 +110,7 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
         receiverId: 4,
         content: text.trim(),
         id: null,
+        senderAvatarPath: user.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH,
         timestamp: DateTime.now(),
       );
 

@@ -7,12 +7,14 @@ class Message {
   String content;
   int receiverId;
   DateTime? timestamp;
+  String senderAvatarPath;
 
   Message({
     required this.senderId,
     required this.senderName,
     required this.receiverId,
     required this.content,
+    required this.senderAvatarPath,
     this.id,
     this.timestamp,
   });
@@ -31,6 +33,7 @@ class Message {
       senderName: json['senderName'],
       receiverId: json['receiverId'],
       content: json['content'],
+      senderAvatarPath: json['senderAvatarPath'],
       id: json['id'],
       timestamp: timestamp,
     );
@@ -42,6 +45,7 @@ class Message {
       "senderName": senderName,
       "content": content,
       "receiverId": receiverId,
+      "senderAvatarPath": senderAvatarPath,
       "id": id,
       "timestamp": timestamp?.toUtc().toIso8601String(), // 存储 UTC 时间
     };
