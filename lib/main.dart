@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
 import 'package:heta/entity/user.dart';
 import 'package:heta/page/administrator_home_page.dart';
+import 'package:heta/page/contact_list_page.dart';
 import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/login_page.dart';
-import 'package:heta/page/realtime_chat_page.dart';
 import 'package:heta/page/user_home_page.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:heta/provider/web_socket_provider.dart';
@@ -133,7 +133,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
         },
       );
     } else if(index == 3){
-      return RealtimeChatPage();
+      return ContactListPage();
     } else
    {
       return Center(
@@ -155,7 +155,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
       );
     }else if(index == 3){
       return AppBar(
-        title: Text("聊天页"),
+        title: Text("消息列表"),
         centerTitle: true,
       );
     }

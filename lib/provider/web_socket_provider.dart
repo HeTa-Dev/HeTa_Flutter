@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:heta/provider/user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'dart:convert';
@@ -7,12 +9,8 @@ import 'package:http/http.dart' as http;
 import '../entity/message.dart';
 import '../config/web_config.dart';
 
-// 这里的 WebSocketProvider 功能和 UserProvider 类似，都是实现全局调用
-// 我们不希望用户在进入聊天页面的时候才连接到 socket ，这样的话也没法实现新消息提醒
-// 所以我们在应用启动的时候就应该连接到socket，并且始终不断开，直到退出应用
-// 后续应该实现应用后台运行的时候，如果收到消息会在用户手机上弹出提示
 class WebSocketProvider with ChangeNotifier {
-
+  int? _currentReceiverId;
   final WebSocketChannel channel = WebSocketChannel.connect(
     Uri.parse('ws://${WebConfig.SERVER_HOST_ADDRESS}:8080/chat'),
   );
@@ -20,36 +18,44 @@ class WebSocketProvider with ChangeNotifier {
   bool _isLoading = false;
   int _page = 0;
   final int _pageSize = 10;
-  int _unreadCount = 0; // 添加未读消息计数
+  int _unreadCount = 0;
 
   List<Message> get messages => _messages;
-  bool get isLoading => _isLoading; // 添加一个 getter 用于公开访问 _isLoading
-  int get unreadCount => _unreadCount; // 公开未读消息计数
+  bool get isLoading => _isLoading;
+  int get unreadCount => _unreadCount;
 
   WebSocketProvider() {
     _listenToMessages();
   }
 
-
-
   void _listenToMessages() {
     channel.stream.listen((data) {
       final Map<String, dynamic> json = jsonDecode(data);
       final message = Message.fromJson(json);
-      _messages.insert(0, message);
+
+      // 检查消息的接收者是否是当前用户的聊天对象
+      if (message.receiverId == getCurrentReceiverId()) {
+        _messages.insert(0, message);
+      }
       _unreadCount++;
       notifyListeners();
     });
   }
+  void clearMessages() {
+    _messages.clear();
+    _page = 0; // 重置分页
+    notifyListeners();
+  }
 
-  Future<void> fetchHistoricalMessages() async {
+  // 根据 receiverId 获取历史消息
+  Future<void> fetchHistoricalMessages({required int receiverId}) async {
     if (_isLoading) return;
 
     _isLoading = true;
     notifyListeners();
 
     final response = await http.get(Uri.parse(
-        'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/messages/history?offset=${_page * _pageSize}&limit=$_pageSize'));
+        'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/messages/getMessageByReceiverId/$receiverId/${_page * _pageSize}/$_pageSize'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -64,12 +70,15 @@ class WebSocketProvider with ChangeNotifier {
   }
 
   void sendMessage(Message message) {
-    _unreadCount--;// 这里是为了解决自己发消息也会导致未读消息数增加的问题
+    // 自己发送的消息不增加未读消息数
+    // 自己发送的消息应该直接插入消息列表，并更新界面
+    _messages.insert(0, message);
+    _unreadCount--;
     channel.sink.add(jsonEncode(message.toJson()));
   }
 
   void clearUnreadCount() {
-    _unreadCount = 0; // 重置未读消息计数
+    _unreadCount = 0;
     notifyListeners();
   }
 
@@ -78,4 +87,16 @@ class WebSocketProvider with ChangeNotifier {
     channel.sink.close(status.goingAway);
     super.dispose();
   }
+
+  // 设置当前的聊天对象 ID
+  void setCurrentReceiverId(int receiverId) {
+    _currentReceiverId = receiverId;
+    notifyListeners();
+  }
+
+  int getCurrentReceiverId() {
+    return _currentReceiverId ?? 0; // 返回当前的 receiverId
+  }
+
+
 }

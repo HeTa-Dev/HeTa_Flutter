@@ -7,6 +7,7 @@ class User{
   int ?age;
   String ?address;
   String ?personalSlogan;
+  Map<int,String> ?contacts;
   int ?id;//id由后端自增生成，不用在前端创建时声明
 
   User({required this.username,
@@ -23,7 +24,7 @@ class User{
       avatarPath: json["avatarPath"],
       age: json["age"],
       address: json["address"],
-      personalSlogan: json["personalSlogan"]
+      personalSlogan: json["personalSlogan"],
     );
   }
 
@@ -37,7 +38,7 @@ class User{
       "avatarPath":avatarPath,
       "age":age,
       "address":address,
-      "personalSlogan":personalSlogan
+      "personalSlogan":personalSlogan,
     };
   }
 }
