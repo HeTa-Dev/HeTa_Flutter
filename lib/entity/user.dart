@@ -7,7 +7,7 @@ class User{
   int ?age;
   String ?address;
   String ?personalSlogan;
-  Map<int,String> ?contacts;
+  List<User> ?contacts;
   int ?id;//id由后端自增生成，不用在前端创建时声明
 
   User({required this.username,

@@ -6,8 +6,7 @@ import 'package:heta/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import '../config/web_config.dart';
 import 'realtime_chat_page.dart';
-import 'package:http/http.dart' as  http;
-
+import 'package:http/http.dart' as http;
 
 class ContactListPage extends StatefulWidget {
   @override
@@ -15,63 +14,63 @@ class ContactListPage extends StatefulWidget {
 }
 
 class _ContactListPageState extends State<ContactListPage> {
-  late Future<List<Map<String, dynamic>>> _contactsFuture;
+  List<User>? contactList;
 
-
-  Future<List<Map<String, dynamic>>> _getContacts(int userId) async {
-    final response = await http.get(Uri.parse('http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/user/getContactById/$userId'));
-
+  Future<void> _getContacts(int userId) async {
+    final response = await http.get(Uri.parse(
+        'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/user/getContactById/$userId'));
     if (response.statusCode == 200) {
-      // 解析并返回一个 List<Map<String, dynamic>>
-      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      final List<dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+      setState(() {
+        contactList = jsonData.map((item) => User.fromJson(item)).toList();
+      });
     } else {
       throw Exception('Failed to load contacts');
     }
   }
+
   void _loadContacts() {
-    final userProvider = Provider.of<UserProvider>(context,listen: false);
-    _contactsFuture = _getContacts(userProvider.user?.id ?? 1);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    _getContacts(userProvider.user?.id ?? 1);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadContacts();
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadContacts();
     return Scaffold(
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _contactsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Failed to load contacts: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No contacts found'));
-          } else {
-            final contacts = snapshot.data!;
-            return ListView.builder(
-              itemCount: contacts.length,
-              itemBuilder: (context, index) {
-                final contact = contacts[index];
-                final id = contact['id'];
-                final name = contact['username'];
+      body: contactList == null
+          ? Center(child: CircularProgressIndicator())
+          : contactList!.isEmpty
+          ? Center(child: Text('No contacts found'))
+          : ListView.builder(
+        itemCount: contactList!.length,
+        itemBuilder: (context, index) {
+          final contact = contactList![index];
+          final id = contact.id;
+          final name = contact.username;
 
-                return ListTile(
-                  title: Text(name),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RealtimeChatPage(
-                          receiverId: id,
-                          receiverName: name,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            );
-          }
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(contact.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
+            ),
+            title: Text(name),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RealtimeChatPage(
+                    receiverId: id ?? 1,
+                    receiverName: name,
+                  ),
+                ),
+              );
+            },
+          );
         },
       ),
     );
