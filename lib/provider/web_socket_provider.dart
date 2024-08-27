@@ -48,14 +48,14 @@ class WebSocketProvider with ChangeNotifier {
   }
 
   // 根据 receiverId 获取历史消息
-  Future<void> fetchHistoricalMessages({required int receiverId}) async {
+  Future<void> fetchHistoricalMessages({required int senderId, required int receiverId}) async {
     if (_isLoading) return;
 
     _isLoading = true;
     notifyListeners();
 
     final response = await http.get(Uri.parse(
-        'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/messages/getMessageByReceiverId/$receiverId/${_page * _pageSize}/$_pageSize'));
+        'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/messages/getMessageById/$senderId/$receiverId/${_page * _pageSize}/$_pageSize'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));

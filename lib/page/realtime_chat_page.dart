@@ -30,8 +30,12 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
       webSocketProvider.clearMessages();
-      webSocketProvider.fetchHistoricalMessages(receiverId: widget.receiverId);
+      webSocketProvider.setCurrentReceiverId(userProvider.user?.id ?? 0);
+      webSocketProvider.fetchHistoricalMessages(
+          senderId: userProvider.user?.id ?? 0,
+          receiverId: widget.receiverId);
       webSocketProvider.clearUnreadCount(); // 清除未读消息计数
     });
   }
@@ -56,7 +60,9 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
                   if (!webSocketProvider.isLoading &&
                       scrollInfo.metrics.pixels ==
                           scrollInfo.metrics.maxScrollExtent) {
-                    webSocketProvider.fetchHistoricalMessages(receiverId: widget.receiverId);
+                    webSocketProvider.fetchHistoricalMessages(
+                        senderId: userProvider.user?.id ?? 0,
+                        receiverId: widget.receiverId);
                   }
                   return true;
                 },
