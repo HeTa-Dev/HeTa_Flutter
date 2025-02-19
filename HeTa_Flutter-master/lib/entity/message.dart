@@ -8,6 +8,7 @@ class Message {
   int receiverId;
   DateTime? timestamp;
   String senderAvatarPath;
+  bool isPrivate;
 
   Message({
     required this.senderId,
@@ -17,6 +18,7 @@ class Message {
     required this.senderAvatarPath,
     this.id,
     this.timestamp,
+    this.isPrivate = true,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,7 @@ class Message {
       senderAvatarPath: json['senderAvatarPath'],
       id: json['id'],
       timestamp: timestamp,
+      isPrivate: json['isPrivate'] ?? true, // 从 JSON 中读取 isPrivate，默认为 true
     );
   }
 
@@ -47,7 +50,8 @@ class Message {
       "receiverId": receiverId,
       "senderAvatarPath": senderAvatarPath,
       "id": id,
-      "timestamp": timestamp?.toUtc().toIso8601String(), // 存储 UTC 时间
+      "timestamp": timestamp?.toUtc().toIso8601String(),// 存储 UTC 时间
+      "isPrivate": isPrivate, // 将 isPrivate 写入 JSON
     };
   }
 }
