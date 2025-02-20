@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
 import 'package:heta/entity/user.dart';
 import 'package:heta/page/administrator_home_page.dart';
+import 'package:heta/page/community_page.dart';
 import 'package:heta/page/contact_list_page.dart';
 import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/login_page.dart';
+import 'package:heta/page/new_post_view_page.dart';
 import 'package:heta/page/user_home_page.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:heta/provider/web_socket_provider.dart';
@@ -132,9 +134,16 @@ class _HetaMainPageState extends State<HetaMainPage> {
           }
         },
       );
-    } else if(index == 3){
+    }
+    else if(index == 1){
+      return CommunityPage();
+    }
+    else if(index == 3){
       return ContactListPage();
-    } else
+    }
+    else if(index == 2){
+      return CommunityPage();
+  }else
    {
       return Center(
         child: Text("该页面尚未搭建完成"),
@@ -148,9 +157,10 @@ class _HetaMainPageState extends State<HetaMainPage> {
         title: Text("首页"),
         centerTitle: true,
       );
-    } else if (index == 2) {
+    }
+    else if (index == 1||index == 2) {
       return AppBar(
-        title: Text("发布页"),
+        title: Text("社区"),
         centerTitle: true,
       );
     }else if(index == 3){
@@ -191,7 +201,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
                     color: Colors.blueAccent,
                   ),
                 ),
-                label: "发布",
+                label: "",
               ),
               BottomNavigationBarItem(
                 icon: Column(
@@ -242,6 +252,27 @@ class _HetaMainPageState extends State<HetaMainPage> {
           );
         },
       ),
+      floatingActionButton: Transform.translate(
+        offset: Offset(0, 20), // 调整 Y 轴的值来控制下移的距离
+        child: Container(
+          height: 60,
+          width: 60,
+          padding: const EdgeInsets.all(0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return NewPostViewPage();
+              }));
+            },
+            child: const Icon(Icons.add),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
