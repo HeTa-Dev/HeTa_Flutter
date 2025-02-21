@@ -80,25 +80,6 @@ class _CommunityPage extends State<CommunityPage> {
                   },
                 ),
               ),
-
-              user?.type =="seller"?Positioned(
-                  right: 20,
-                  bottom: 20,
-                  child: FloatingActionButton(
-                    onPressed: (){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => NewPostViewPage()),
-                      ).then((value) {
-                        if (value == true) {
-                          _getPostView(); // 当从 NewPostViewPage 返回，并且发布成功时刷新帖子视图
-                        }
-                      });
-                    },
-                    child: Icon(Icons.border_color),
-                    shape: CircleBorder(),
-                  )
-              ):Text("")
             ]
         )
     );

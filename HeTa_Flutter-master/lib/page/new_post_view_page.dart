@@ -152,6 +152,14 @@ class _NewPostViewPage extends State<NewPostViewPage> {
           });
     }
   }
+
+  // 删除图片
+  void _deleteImage(int index) {
+    setState(() {
+      _images.removeAt(index);
+    });
+  }
+
   // 显示图片预览，也就是点击图片可以查看放大的图片，同时放大过的图片也可以用手指再次缩放
   void _showImagePreview(File image) {
     showDialog(
@@ -229,17 +237,29 @@ class _NewPostViewPage extends State<NewPostViewPage> {
                         } else {
                           return Padding(
                             padding: const EdgeInsets.only(right: 10),
-                            child: GestureDetector(
-                              onTap: () => _showImagePreview(_images[index]),
-                              child: ClipRRect(
-                                child: Image.file(
-                                  _images[index],
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
+                            child: Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => _showImagePreview(_images[index]),
+                                  child: ClipRRect(
+                                    child: Image.file(
+                                      _images[index],
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.white),
+                                    onPressed: () => _deleteImage(index),
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         }
