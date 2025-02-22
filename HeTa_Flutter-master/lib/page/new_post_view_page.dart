@@ -109,7 +109,7 @@ class _NewPostViewPage extends State<NewPostViewPage> {
         coverImagePath: imagePath[0],
         imagePathList: imagePath,
         coverWidth: decodedImage?.width,
-        coverHeight: decodedImage?.height
+        coverHeight: decodedImage?.height,
     );
 
     final response1 = await http.post(

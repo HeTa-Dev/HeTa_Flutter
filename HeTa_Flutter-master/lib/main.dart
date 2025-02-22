@@ -76,7 +76,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userPhoneNum = prefs.getString('userPhoneNum');
-    isLoggedIn = userPhoneNum != null && userPhoneNum!.isNotEmpty;
+    isLoggedIn = prefs.getBool('isLoggedIn') ?? userPhoneNum != null && userPhoneNum!.isNotEmpty;
 
     if (isLoggedIn) {
       setState(() {});
@@ -98,13 +98,13 @@ class _HetaMainPageState extends State<HetaMainPage> {
         },
       );
 
-      isAuthenticated = userPhoneNum != null && userPhoneNum!.isNotEmpty; // 验证是否已认证
+      isAuthenticated = userPhoneNum != null && userPhoneNum!.isNotEmpty;
     }
 
     // 保存登录状态和手机号码
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('userPhoneNum', userPhoneNum!);
-
+    prefs.setBool('isLoggedIn', true);
     setState(() {});
 
     Navigator.push(
