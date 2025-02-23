@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 
 class Comment {
   int? id;

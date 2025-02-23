@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:heta/entity/order_view.dart';
 import 'package:heta/page/order_view_detail_page.dart';

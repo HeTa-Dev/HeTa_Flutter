@@ -1,16 +1,13 @@
 import 'dart:convert';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:heta/config/web_config.dart';
-import 'package:heta/page/new_post_view_page.dart';
 import 'package:heta/page/self_def_container/my_post_view_container.dart';
-import 'package:heta/page/self_def_container/post_view_container.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:waterfall_flow/waterfall_flow.dart';
 import '../../provider/user_provider.dart';
 import '../../entity/post_view.dart';
+
+//这整个文件夹页面，都是my_page跳转后的子页面，之后还可能要写浏览历史等等
 
 // 我的帖子页面
 class MyPostsPage extends StatefulWidget {

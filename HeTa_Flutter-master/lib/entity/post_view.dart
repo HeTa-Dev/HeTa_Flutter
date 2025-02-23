@@ -1,4 +1,3 @@
-import 'comment.dart';
 
 class PostView {
   int? id;

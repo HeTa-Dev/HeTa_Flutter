@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:heta/entity/order_view.dart';
@@ -36,7 +35,6 @@ class _NewOrderViewPage extends State<NewOrderViewPage> {
   bool _isLoading = false; // 方便显示加载中图标
 
   // 这是用来从手机相册中选择图片，目前一次只能添加一张
-  // TODO：将来可以考虑实现一次性添加多张图片的功能
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 

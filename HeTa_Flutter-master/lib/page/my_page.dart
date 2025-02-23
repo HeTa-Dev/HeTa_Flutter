@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/my_page_children/my_post_page.dart';
-import 'package:heta/page/sign_up_page.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:heta/config/web_config.dart';
 
+//这里是我的界面，其中其实只有我发布的帖子的功能，其他没有要求做。
+//另外我并没有区分用户，和商人。并没有我的商人发布的商品的功能。
 class MyPage extends StatelessWidget {
   const MyPage({super.key});
 

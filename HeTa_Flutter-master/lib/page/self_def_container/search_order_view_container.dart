@@ -1,39 +1,33 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:heta/entity/post_view.dart';
-import '../post_view_detail_page.dart';
+import 'package:heta/entity/order_view.dart';
+import '../order_view_detail_page.dart';
 
-// 这是自定义的用于在主页面上显示postView的容器，这是我的帖子界面的容器，和主界面的样子不一样
-class MyPostViewContainer extends StatefulWidget {
-  final PostView postView;
+// 这是自定义的用于在主页面上显示orderView的容器，这个是搜索界面查看的容器，和主界面展现的帖子形式不一样。
+class SearchOrderViewContainer extends StatefulWidget {
+  final OrderView orderView;
 
-  // 构造方法需要postView中的信息
-  MyPostViewContainer({required this.postView});
+  // 构造方法需要orderView中的信息
+  SearchOrderViewContainer({required this.orderView});
 
   @override
   State<StatefulWidget> createState() {
-    return _PostViewContainer();
+    return _OrderViewContainer();
   }
 }
 
-// flutter会自动将滑出屏幕的一些元件清除，这会导致在页面快速滑动的时候，不断重复build。
-// 由于我们目前还没有很好地利用占位符，图片加载的时候很奇怪，因为文字比图片加载得更快。
-// 本来UI在build的时候就会有伸缩。这样会给用户带来很不好的体验
-// 所以这里我们告诉flutter框架不要清理这个自定义Container。
-// 最终效果就是页面只会在刚进入的时候伸缩一次，用户体验好了很多，但也会占用更多内存。
-// 2024.8.3 最新情况：占位符已经实现了根据图片尺寸自适应，
-// 但这里不打算改了，因为不改的话用户体验更好
-class _PostViewContainer extends State<MyPostViewContainer> with AutomaticKeepAliveClientMixin<MyPostViewContainer> {
+
+class _OrderViewContainer extends State<SearchOrderViewContainer> with AutomaticKeepAliveClientMixin<SearchOrderViewContainer> {
   @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    // 用GestureDetector包裹Container是为了给它加上点击事件，即查看postView详情
+    // 用GestureDetector包裹Container是为了给它加上点击事件，即查看orderView详情
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => PostViewDetailPage(postView: widget.postView)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => OrderViewDetailPage(orderView: widget.orderView)));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -60,14 +54,14 @@ class _PostViewContainer extends State<MyPostViewContainer> with AutomaticKeepAl
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      widget.postView.title,
+                      widget.orderView.title,
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      widget.postView.userName,
-                      style: TextStyle(fontSize: 10),
+                      widget.orderView.price.toString(),
+                      style: TextStyle(fontSize: 30,color: Colors.red),
                     ),
                   ],
                 ),
@@ -84,7 +78,7 @@ class _PostViewContainer extends State<MyPostViewContainer> with AutomaticKeepAl
                 child: AspectRatio(
                   aspectRatio: 1 / 1, // 保证图片是正方形
                   child: CachedNetworkImage(
-                    imageUrl: widget.postView.coverImagePath,
+                    imageUrl: widget.orderView.coverImagePath,
                     placeholder: (context, url) => Container(
                       color: Colors.grey[200],
                     ),

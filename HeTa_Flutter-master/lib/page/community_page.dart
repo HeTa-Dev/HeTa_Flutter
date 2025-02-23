@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
-import 'package:heta/page/new_post_view_page.dart';
 import 'package:heta/page/self_def_container/post_view_container.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -11,7 +9,6 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 
 import '../entity/post_view.dart';
 import '../provider/user_provider.dart';
-import '../provider/web_socket_provider.dart';
 
 
 // 这里是用户进入app后的主页面，显示市场上的各种交易

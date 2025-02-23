@@ -11,6 +11,7 @@ import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/login_page.dart';
 import 'package:heta/page/my_page.dart';
 import 'package:heta/page/new_post_view_page.dart';
+import 'package:heta/page/SearchPage.dart';
 import 'package:heta/page/user_home_page.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:heta/provider/web_socket_provider.dart';
@@ -177,6 +178,18 @@ class _HetaMainPageState extends State<HetaMainPage> {
       return AppBar(
         title: Text("首页"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // 点击搜索图标后跳转到搜索页面
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchPage()),
+              );
+            },
+          ),
+        ],
       );
     } else if (index == 1 || index == 2) {
       return AppBar(

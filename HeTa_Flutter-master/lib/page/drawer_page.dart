@@ -1,9 +1,8 @@
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
 import 'package:heta/main.dart';
+import 'package:heta/page/settings_page.dart';
 import 'package:heta/page/user_detail_page.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 // 这是侧边栏，可以通过主页面appBar上的按钮打开,也可以直接右滑打开
+//里面的设置目前只有修改密码
 class DrawerPage extends StatelessWidget {
 
   @override
@@ -83,6 +83,13 @@ class DrawerPage extends StatelessWidget {
                     ListTile(
                       leading: Icon(Icons.settings),
                       title: Text('设置'),
+                      onTap: () {
+                        // 使用 Navigator.push 跳转到 SettingsPage
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SettingsPage()),
+                        );
+                      },
                     ),
                   ],
                 ),

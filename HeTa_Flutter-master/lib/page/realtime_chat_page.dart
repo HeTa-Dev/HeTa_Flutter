@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
-import 'package:heta/entity/user.dart';
 import 'package:provider/provider.dart';
 import '../entity/message.dart';
 import '../provider/user_provider.dart';

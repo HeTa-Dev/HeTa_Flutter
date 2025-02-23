@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
 import 'package:http/http.dart' as http;
@@ -20,7 +19,6 @@ class PostViewDetailPage extends StatefulWidget {
 }
 
 class _PostViewDetailPageState extends State<PostViewDetailPage> {
-  bool _isLoading = false;
 
   int _currentIndex = 0; // 默认当前索引为0
   User? user;
@@ -63,7 +61,7 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
   // 发布评论的方法
   Future<void> _publishComment() async {
     setState(() {
-      _isLoading = true; // 显示加载图标
+// 显示加载图标
     });
 
     String commentContent = _commentController.text.trim();
@@ -89,7 +87,7 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
         );
 
         setState(() {
-          _isLoading = false; // 上传完成，隐藏加载图标
+// 上传完成，隐藏加载图标
         });
 
         if (response.statusCode == 200) {
@@ -127,7 +125,7 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
         }
       } catch (e) {
         setState(() {
-          _isLoading = false; // 出现异常，隐藏加载图标
+// 出现异常，隐藏加载图标
         });
         showDialog(
           context: context,
@@ -144,7 +142,7 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
       }
     } else {
       setState(() {
-        _isLoading = false; // 评论内容为空，隐藏加载图标
+// 评论内容为空，隐藏加载图标
       });
       showDialog(
         context: context,
@@ -362,7 +360,7 @@ class CommentContainer extends StatelessWidget {
             children: [
               CircleAvatar(
                 // 这里假设 Comment 类中有 avatarPath 属性
-                backgroundImage: NetworkImage(comment.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
+                backgroundImage: NetworkImage(comment.avatarPath),
                 radius: 15,
               ),
               SizedBox(width: 10),
