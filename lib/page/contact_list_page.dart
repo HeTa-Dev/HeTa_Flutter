@@ -8,6 +8,7 @@ import '../config/web_config.dart';
 import 'realtime_chat_page.dart';
 import 'package:http/http.dart' as http;
 
+//这个界面我还没弄，聊天
 class ContactListPage extends StatefulWidget {
   @override
   _ContactListPageState createState() => _ContactListPageState();

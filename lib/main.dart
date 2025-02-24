@@ -5,14 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
 import 'package:heta/entity/user.dart';
 import 'package:heta/page/administrator_home_page.dart';
+import 'package:heta/page/community_page.dart';
 import 'package:heta/page/contact_list_page.dart';
 import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/login_page.dart';
+import 'package:heta/page/my_page.dart';
+import 'package:heta/page/new_post_view_page.dart';
+import 'package:heta/page/SearchPage.dart';
 import 'package:heta/page/user_home_page.dart';
 import 'package:heta/provider/user_provider.dart';
 import 'package:heta/provider/web_socket_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /*
  一些开发过程中总结的经验：
@@ -36,7 +41,6 @@ void main() {
       child: HetaApp(),
     ),
   );
-
 }
 
 User? currentUser;
@@ -62,13 +66,26 @@ class _HetaMainPageState extends State<HetaMainPage> {
   // _selectedIndex 用来确定底部导航栏被选中的是哪一个，也就是你现在在哪个页面
   int _selectedIndex = 0;
   String? userPhoneNum;
+  bool isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
-    // 在进入应用前需要登录，否则无法进入应用
-    WidgetsBinding.instance.addPostFrameCallback((_) => _showLoginDialog());
+    _checkLoginStatus();
   }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userPhoneNum = prefs.getString('userPhoneNum');
+    isLoggedIn = prefs.getBool('isLoggedIn') ?? userPhoneNum != null && userPhoneNum!.isNotEmpty;
+
+    if (isLoggedIn) {
+      setState(() {});
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showLoginDialog());
+    }
+  }
+
   // 不登录就没法关闭这个弹窗，无法操作应用内的组件
   Future<void> _showLoginDialog() async {
     bool isAuthenticated = false;
@@ -82,29 +99,37 @@ class _HetaMainPageState extends State<HetaMainPage> {
         },
       );
 
-      isAuthenticated = userPhoneNum != null && userPhoneNum!.isNotEmpty; // 验证是否已认证
+      isAuthenticated = userPhoneNum != null && userPhoneNum!.isNotEmpty;
     }
 
+    // 保存登录状态和手机号码
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('userPhoneNum', userPhoneNum!);
+    prefs.setBool('isLoggedIn', true);
     setState(() {});
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HetaMainPage()));
   }
 
   // 根据登入时的手机号码获取用户信息，便于显示头像、昵称等等
   Future<User> _fetchUser() async {
     int phoneNum = int.parse(userPhoneNum!);
-    final response = await http.get(Uri.parse("http://"+ WebConfig.SERVER_HOST_ADDRESS +":8080/heta/user/findUserByPhoneNum/$phoneNum"));
+    final response = await http.get(Uri.parse("http://" + WebConfig.SERVER_HOST_ADDRESS + ":8080/heta/user/findUserByPhoneNum/$phoneNum"));
     Map<String, dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
     currentUser = User.fromJson(jsonData);
     return currentUser!;
   }
 
   // 获取用户详细资料，同步到UserProvider中
-  getUserDetail() async{
-    final userProvider = Provider.of<UserProvider>(context,listen: false);
+  getUserDetail() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.user;
-    final response = await http.get(Uri.parse("http://"+WebConfig.SERVER_HOST_ADDRESS+":8080/heta/user/getUserDetailById/${user!.id}"));
-    Map<String,dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+    final response = await http.get(Uri.parse("http://" + WebConfig.SERVER_HOST_ADDRESS + ":8080/heta/user/getUserDetailById/${user!.id}"));
+    Map<String, dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
     User tempUser = User.fromJson(jsonData);
-    Provider.of<UserProvider>(context,listen: false).setUser(tempUser);
+    Provider.of<UserProvider>(context, listen: false).setUser(tempUser);
   }
 
   Widget _buildBody(index) {
@@ -119,7 +144,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
             return Center(child: Text("加载用户信息时出错！"));
           } else {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              final userProvider = Provider.of<UserProvider>(context,listen: false);
+              final userProvider = Provider.of<UserProvider>(context, listen: false);
               userProvider.setUser(currentUser!);
               getUserDetail();
             });
@@ -132,10 +157,16 @@ class _HetaMainPageState extends State<HetaMainPage> {
           }
         },
       );
-    } else if(index == 3){
+    } else if (index == 1) {
+      return CommunityPage();
+    } else if (index == 3) {
       return ContactListPage();
-    } else
-   {
+    } else if (index == 2) {
+      return CommunityPage();
+    }else if(index == 4){
+      return MyPage();
+    }
+    else {
       return Center(
         child: Text("该页面尚未搭建完成"),
       );
@@ -147,19 +178,36 @@ class _HetaMainPageState extends State<HetaMainPage> {
       return AppBar(
         title: Text("首页"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // 点击搜索图标后跳转到搜索页面
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchPage()),
+              );
+            },
+          ),
+        ],
       );
-    } else if (index == 2) {
+    } else if (index == 1 || index == 2) {
       return AppBar(
-        title: Text("发布页"),
+        title: Text("社区"),
         centerTitle: true,
       );
-    }else if(index == 3){
+    } else if (index == 3) {
       return AppBar(
         title: Text("消息列表"),
         centerTitle: true,
       );
     }
-    else {
+    else if(index == 4){
+     return AppBar(
+         title: Text("个人"),
+        centerTitle: true,
+     );
+  }  else{
       return AppBar(
         title: Text("页面开发中..."),
       );
@@ -168,6 +216,10 @@ class _HetaMainPageState extends State<HetaMainPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!isLoggedIn) {
+      return Container();
+    }
+
     return Scaffold(
       appBar: _buildAppBar(_selectedIndex),
       body: _buildBody(_selectedIndex),
@@ -191,7 +243,7 @@ class _HetaMainPageState extends State<HetaMainPage> {
                     color: Colors.blueAccent,
                   ),
                 ),
-                label: "发布",
+                label: "",
               ),
               BottomNavigationBarItem(
                 icon: Column(
@@ -242,6 +294,27 @@ class _HetaMainPageState extends State<HetaMainPage> {
           );
         },
       ),
+      floatingActionButton: Transform.translate(
+        offset: Offset(0, 20), // 调整 Y 轴的值来控制下移的距离
+        child: Container(
+          height: 60,
+          width: 60,
+          padding: const EdgeInsets.all(0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return NewPostViewPage();
+              }));
+            },
+            child: const Icon(Icons.add),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

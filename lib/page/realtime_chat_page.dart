@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
-import 'package:heta/entity/user.dart';
 import 'package:provider/provider.dart';
 import '../entity/message.dart';
 import '../provider/user_provider.dart';
@@ -8,7 +7,6 @@ import '../provider/web_socket_provider.dart';
 import '../page/self_def_container/chat_bubble.dart';
 
 // 这里是实时聊天页面
-// 目前只实现了聊天室功能，尚未实现私聊功能
 // 后期可以增加一个联系人页面，导航到这个页面来进行私聊
 class RealtimeChatPage extends StatefulWidget {
   final int receiverId;
@@ -34,8 +32,10 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
       webSocketProvider.clearMessages();
       webSocketProvider.setCurrentReceiverId(userProvider.user?.id ?? 0);
       webSocketProvider.fetchHistoricalMessages(
-          senderId: userProvider.user?.id ?? 0,
-          receiverId: widget.receiverId);
+        senderId: userProvider.user?.id ?? 0,
+        receiverId: widget.receiverId,
+        isPrivate: true, // 只加载私信消息
+      );
       webSocketProvider.clearUnreadCount(); // 清除未读消息计数
     });
   }
@@ -62,7 +62,8 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
                           scrollInfo.metrics.maxScrollExtent) {
                     webSocketProvider.fetchHistoricalMessages(
                         senderId: userProvider.user?.id ?? 0,
-                        receiverId: widget.receiverId);
+                        receiverId: widget.receiverId,
+                        isPrivate: true);
                   }
                   return true;
                 },
@@ -82,13 +83,17 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
                     }
 
                     final message = messages[index];
-                    return ChatBubble(
-                      timestamp: message.timestamp ?? DateTime.now(),
-                      message: message.content,
-                      isMe: message.senderId == user!.id,
-                      senderName: message.senderName,
-                      avatarPath: message.senderAvatarPath,
-                    );
+                    if (message.receiverId == widget.receiverId && message.isPrivate) {
+                      return ChatBubble(
+                        timestamp: message.timestamp ?? DateTime.now(),
+                        message: message.content,
+                        isMe: message.senderId == user!.id,
+                        senderName: message.senderName,
+                        avatarPath: message.senderAvatarPath,
+                      );
+                    } else {
+                      return SizedBox.shrink(); // 如果不是当前接收者的私信，则不显示
+                    }
                   },
                 ),
               ),
@@ -130,6 +135,7 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
         id: null,
         senderAvatarPath: user.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH, // 这里可以替换为实际的头像路径
         timestamp: DateTime.now(),
+        isPrivate: true
       );
 
       webSocketProvider.sendMessage(message);

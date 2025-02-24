@@ -41,6 +41,7 @@ class WebSocketProvider with ChangeNotifier {
       notifyListeners();
     });
   }
+
   void clearMessages() {
     _messages.clear();
     _page = 0; // 重置分页
@@ -48,7 +49,7 @@ class WebSocketProvider with ChangeNotifier {
   }
 
   // 根据 receiverId 获取历史消息
-  Future<void> fetchHistoricalMessages({required int senderId, required int receiverId}) async {
+  Future<void> fetchHistoricalMessages({required int senderId, required int receiverId, required bool isPrivate}) async {
     if (_isLoading) return;
 
     _isLoading = true;
@@ -97,6 +98,4 @@ class WebSocketProvider with ChangeNotifier {
   int getCurrentReceiverId() {
     return _currentReceiverId ?? 0; // 返回当前的 receiverId
   }
-
-
 }
