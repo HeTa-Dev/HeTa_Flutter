@@ -100,6 +100,7 @@ class _NewPostViewPage extends State<NewPostViewPage> {
 
     PostView postView = PostView(
         userName: user!.username,
+        userType: user.type,
         userId: user.id ?? 0,
         title: _titleController.text,
         text: _textController.text,

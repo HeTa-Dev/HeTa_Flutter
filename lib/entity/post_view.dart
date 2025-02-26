@@ -3,6 +3,7 @@ class PostView {
   int? id;
   int userId;
   String userName;
+  String userType;
   String title;
   String text;
   String coverImagePath;
@@ -17,6 +18,7 @@ class PostView {
     required this.text,
     required this.coverImagePath,
     required this.userName,
+    required this.userType,
     this.id,
     this.imagePathList,
     this.coverHeight,
@@ -45,6 +47,7 @@ class PostView {
       id: json["id"],
       userId: json["userId"],
       userName: json["userName"],
+      userType: json["userType"],
       title: json["title"],
       text: json["text"],
       coverImagePath: json["coverImagePath"],

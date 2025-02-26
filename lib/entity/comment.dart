@@ -4,6 +4,7 @@ class Comment {
   int userId;
   int postId;
   String userName;
+  String userType;
   String content;
   DateTime createdAt;
   String avatarPath; // 新增 avatarPath 属性
@@ -13,6 +14,7 @@ class Comment {
     required this.userId,
     required this.postId,
     required this.userName,
+    required this.userType,
     required this.content,
     required this.createdAt,
     required this.avatarPath, // 新增构造函数参数
@@ -24,6 +26,7 @@ class Comment {
       "userId": userId,
       "postId": postId,
       "userName": userName,
+      "userType": userType,
       "content": content,
       "createdAt": createdAt.toIso8601String(),
       "avatarPath": avatarPath,
@@ -36,6 +39,7 @@ class Comment {
       userId: json["userId"],
       postId: json["postId"],
       userName: json["userName"],
+      userType: json["userType"],
       content: json["content"],
       createdAt: DateTime.parse(json["createdAt"]),
       avatarPath: json["avatarPath"], // 新增 fromJson 处理

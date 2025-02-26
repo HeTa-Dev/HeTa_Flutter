@@ -12,6 +12,7 @@ import '../provider/user_provider.dart'; // 假设你已经有 Comment 类
 // 这里是一个postView的详情页面，通过点击主页面的自定义Container进入
 class PostViewDetailPage extends StatefulWidget {
   final PostView postView;
+
   PostViewDetailPage({required this.postView});
 
   @override
@@ -19,7 +20,6 @@ class PostViewDetailPage extends StatefulWidget {
 }
 
 class _PostViewDetailPageState extends State<PostViewDetailPage> {
-
   int _currentIndex = 0; // 默认当前索引为0
   User? user;
   TextEditingController _commentController = TextEditingController();
@@ -29,10 +29,12 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
   // 在主页的时候只知道userId和userName，这里要用到头像什么的
   _getUser(int userId) async {
     final response = await http.get(
-      Uri.parse("http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/user/findUserById/$userId"),
+      Uri.parse(
+          "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/user/findUserById/$userId"),
     );
     if (response.statusCode == 200) {
-      Map<String, dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+      Map<String, dynamic> jsonData =
+          jsonDecode(utf8.decode(response.bodyBytes));
       setState(() {
         user = User.fromJson(jsonData);
       });
@@ -45,7 +47,8 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
   // 获取评论数据
   _getComments() async {
     final response = await http.get(
-      Uri.parse("http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/comment/findCommentsByPostId/${widget.postView.id}"),
+      Uri.parse(
+          "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/comment/findCommentsByPostId/${widget.postView.id}"),
     );
     if (response.statusCode == 200) {
       List<dynamic> jsonList = jsonDecode(utf8.decode(response.bodyBytes));
@@ -72,16 +75,17 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
       Comment newComment = Comment(
         userId: user?.id ?? 0,
         userName: user?.username ?? "",
+        userType: user!.type,
         content: commentContent,
         createdAt: DateTime.now(),
-        postId: widget.postView.id??0,
-          avatarPath: user?.avatarPath??WebConfig.DEFAULT_IMAGE_PATH,
-
+        postId: widget.postView.id ?? 0,
+        avatarPath: user.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH,
       );
 
       try {
         final response = await http.post(
-          Uri.parse("http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/comment/addNewComment"),
+          Uri.parse(
+              "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/comment/addNewComment"),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode(newComment.toJson()),
         );
@@ -159,7 +163,6 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -173,19 +176,21 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
       appBar: AppBar(
         title: user == null
             ? CircularProgressIndicator(
-          strokeWidth: 2.5,
-        ) // 如果 user 为空，显示加载指示器
+                strokeWidth: 2.5,
+              ) // 如果 user 为空，显示加载指示器
             : Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                  user!.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
-            ),
-            SizedBox(width: 10),
-            Text(user!.username,
-              style: TextStyle(fontSize: 12),),
-          ],
-        ),
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        user!.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    user!.username,
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
       ),
       body: Column(
         children: [
@@ -204,10 +209,11 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                         });
                       },
                       itemBuilder: (context, index) {
-                        String imageUrl = widget.postView.imagePathList != null &&
-                            widget.postView.imagePathList!.isNotEmpty
-                            ? widget.postView.imagePathList![index]
-                            : widget.postView.coverImagePath;
+                        String imageUrl =
+                            widget.postView.imagePathList != null &&
+                                    widget.postView.imagePathList!.isNotEmpty
+                                ? widget.postView.imagePathList![index]
+                                : widget.postView.coverImagePath;
 
                         return GestureDetector(
                           onTap: () {
@@ -230,7 +236,8 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("${_currentIndex + 1}/${widget.postView.imagePathList?.length ?? 1}")
+                      Text(
+                          "${_currentIndex + 1}/${widget.postView.imagePathList?.length ?? 1}")
                     ],
                   ),
                   Padding(
@@ -262,7 +269,8 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Text(
                             '评论',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
                         Divider(),
@@ -285,8 +293,10 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                 Expanded(
                   child: TextField(
                     controller: _commentController,
-                    keyboardType: TextInputType.multiline, // 设置键盘类型为多行输入
-                    textInputAction: TextInputAction.newline, // 设置回车键行为为换行
+                    keyboardType: TextInputType.multiline,
+                    // 设置键盘类型为多行输入
+                    textInputAction: TextInputAction.newline,
+                    // 设置回车键行为为换行
                     maxLines: null,
                     decoration: InputDecoration(
                       hintText: '请输入评论',
@@ -367,13 +377,33 @@ class CommentContainer extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    comment.userName,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color:Colors.grey),
-                  ),
+                  Row(children: [
+                    if (comment.userType == 'administrator')
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          '管理员',
+                          style: TextStyle(fontSize: 10, color: Colors.white),
+                        ),
+                      ),
+                    SizedBox(width: 5), // 添加tag和标题之间的间距
+                    Text(
+                      comment.userName,
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey),
+                    ),
+                  ]),
                   Text(
                     // 格式化日期
-                    DateFormat('yyyy-MM-dd HH').format(comment.createdAt)+"点", // 这里根据实际的 createdAt 进行格式化
+                    DateFormat('yyyy-MM-dd HH').format(comment.createdAt) +
+                        "点", // 这里根据实际的 createdAt 进行格式化
                     style: TextStyle(fontSize: 10, color: Colors.grey),
                   ),
                 ],

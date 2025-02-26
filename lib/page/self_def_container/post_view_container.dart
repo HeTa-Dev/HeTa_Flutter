@@ -74,6 +74,20 @@ class _PostViewContainer extends State<PostViewContainer> with AutomaticKeepAliv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // 根据userType添加红色tag
+                    if (widget.postView.userType == 'administrator')
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          '管理员',
+                          style: TextStyle(fontSize: 10, color: Colors.white),
+                        ),
+                      ),
+                    SizedBox(height: 5), // 添加tag和标题之间的间距
                     Text(
                       widget.postView.title,
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
