@@ -108,6 +108,8 @@ class _NewPostViewPage extends State<NewPostViewPage> {
         imagePathList: imagePath,
         coverWidth: decodedImage?.width,
         coverHeight: decodedImage?.height,
+        likeCount: 0,
+        dislikeCount: 0
     );
 
     final response1 = await http.post(

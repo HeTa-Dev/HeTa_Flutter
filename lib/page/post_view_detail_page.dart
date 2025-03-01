@@ -24,6 +24,8 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
   User? user;
   TextEditingController _commentController = TextEditingController();
   List<Comment> comments = []; // 存储获取到的评论
+  int likeCount = 0;
+  int dislikeCount = 0;
 
   // 根据postView中的userId获取user信息
   // 在主页的时候只知道userId和userName，这里要用到头像什么的
@@ -168,6 +170,8 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
     super.initState();
     _getUser(widget.postView.userId);
     _getComments(); // 初始化时获取评论数据
+    likeCount = widget.postView.likeCount;
+    dislikeCount = widget.postView.dislikeCount;
   }
 
   @override
@@ -189,6 +193,19 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                     user!.username,
                     style: TextStyle(fontSize: 12),
                   ),
+                  SizedBox(width: 10),
+                  if (user?.type == 'administrator')
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        '管理员',
+                        style: TextStyle(fontSize: 10, color: Colors.white),
+                      ),
+                    ),
                 ],
               ),
       ),
@@ -260,6 +277,39 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                       ],
                     ),
                   ),
+                  Row(children: [
+                    IconButton(
+                      icon: Icon(Icons.thumb_up),
+                      onPressed: () {
+                        setState(() {
+                          likeCount = (likeCount + 1);
+                          widget.postView.likeCount = likeCount;
+                          http.post(Uri.parse(
+                              "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/postView/increaseLikeCount/${widget.postView.id}"));
+                        });
+                      },
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      '${likeCount}',
+                    ),
+                    SizedBox(width: 10),
+                    IconButton(
+                      icon: Icon(Icons.thumb_down),
+                      onPressed: () {
+                        setState(() {
+                          dislikeCount = (dislikeCount + 1);
+                          widget.postView.dislikeCount = dislikeCount;
+                          http.post(Uri.parse(
+                              "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/postView/increaseDislikeCount/${widget.postView.id}"));
+                        });
+                      },
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      '${dislikeCount}',
+                    ),
+                  ]),
                   // 显示评论列表
                   if (comments.isNotEmpty)
                     Column(

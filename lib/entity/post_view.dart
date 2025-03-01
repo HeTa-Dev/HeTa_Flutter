@@ -10,6 +10,8 @@ class PostView {
   List<String>? imagePathList;
   int? coverHeight;
   int? coverWidth;
+  int likeCount;
+  int dislikeCount;
   //List<Comment>? comments;
 
   PostView({
@@ -23,6 +25,8 @@ class PostView {
     this.imagePathList,
     this.coverHeight,
     this.coverWidth,
+    required this.likeCount,
+    required this.dislikeCount
    // this.comments,
   });
 
@@ -56,6 +60,8 @@ class PostView {
           : null,
       coverHeight: json["coverHeight"],
       coverWidth: json["coverWidth"],
+      likeCount: json["likeCount"],
+      dislikeCount: json["dislikeCount"],
       // 处理 comments 属性，将 JSON 列表转为 Comment 对象列表
       // comments: json["comments"] != null
       //     ? List<Comment>.from(
