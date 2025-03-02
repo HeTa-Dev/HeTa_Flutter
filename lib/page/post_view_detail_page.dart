@@ -21,7 +21,7 @@ class PostViewDetailPage extends StatefulWidget {
 
 class _PostViewDetailPageState extends State<PostViewDetailPage> {
   int _currentIndex = 0; // 默认当前索引为0
-  User? user;
+  User? user, currentUser;
   TextEditingController _commentController = TextEditingController();
   List<Comment> comments = []; // 存储获取到的评论
   int likeCount = 0;
@@ -176,6 +176,8 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    currentUser = userProvider.user;
     return Scaffold(
       appBar: AppBar(
         title: user == null
@@ -194,6 +196,7 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                     style: TextStyle(fontSize: 12),
                   ),
                   SizedBox(width: 10),
+                  //显示管理员标识
                   if (user?.type == 'administrator')
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -309,6 +312,31 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                     Text(
                       '${dislikeCount}',
                     ),
+                    SizedBox(width: 10),
+                    IconButton(
+                      icon: Icon(Icons.warning),
+                      onPressed: () {
+                        http.post(Uri.parse(
+                            "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/postView/setReported/${widget.postView.id}"));
+                      },
+                    ),
+                    SizedBox(width: 10),
+                    if (currentUser?.type == "administrator")
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          http.delete(Uri.parse("http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/postView/deletePostView/${widget.postView.id}"));
+                        },
+                      ),
+                    SizedBox(width: 10),
+                    if (currentUser?.type == "administrator")
+                      IconButton(
+                        icon: Icon(Icons.undo),
+                        onPressed: () {
+                          http.post(Uri.parse(
+                              "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/postView/setUnReported/${widget.postView.id}"));
+                        },
+                      )
                   ]),
                   // 显示评论列表
                   if (comments.isNotEmpty)

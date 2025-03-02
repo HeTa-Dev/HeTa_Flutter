@@ -12,6 +12,7 @@ class PostView {
   int? coverWidth;
   int likeCount;
   int dislikeCount;
+  bool isReported;
   //List<Comment>? comments;
 
   PostView({
@@ -26,7 +27,8 @@ class PostView {
     this.coverHeight,
     this.coverWidth,
     required this.likeCount,
-    required this.dislikeCount
+    required this.dislikeCount,
+    required this.isReported,
    // this.comments,
   });
 
@@ -62,6 +64,7 @@ class PostView {
       coverWidth: json["coverWidth"],
       likeCount: json["likeCount"],
       dislikeCount: json["dislikeCount"],
+      isReported: json["reported"],
       // 处理 comments 属性，将 JSON 列表转为 Comment 对象列表
       // comments: json["comments"] != null
       //     ? List<Comment>.from(
