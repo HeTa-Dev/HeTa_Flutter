@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
+import 'package:heta/page/user_main_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -186,10 +187,34 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
               ) // 如果 user 为空，显示加载指示器
             : Row(
                 children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        user!.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
-                  ),
+                  GestureDetector(
+                      onTap: () {
+                        // 点击头像后跳转到新页面
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserProfile(user: user)),
+                        );
+                      },
+                      child: Row(children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              user!.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
+                        ),
+                        SizedBox(width: 10),
+                        if (user?.isBanned == true)
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              '该用户被封禁',
+                              style: TextStyle(fontSize: 10, color: Colors.white),
+                            ),
+                          ),
+                      ])),
                   SizedBox(width: 10),
                   Text(
                     user!.username,
@@ -325,7 +350,8 @@ class _PostViewDetailPageState extends State<PostViewDetailPage> {
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
-                          http.delete(Uri.parse("http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/postView/deletePostView/${widget.postView.id}"));
+                          http.delete(Uri.parse(
+                              "http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/postView/deletePostView/${widget.postView.id}"));
                         },
                       ),
                     SizedBox(width: 10),

@@ -167,6 +167,7 @@ class _SignUpPage extends State<SignUpPage> {
       passwd: password,
       type: _typeController.text,
       phoneNum: int.parse(_phoneNumberController.text),
+      isBanned: false
     );
     final response = await http.post(
       Uri.parse("http://" + WebConfig.SERVER_HOST_ADDRESS + ":8080/heta/user/addNewUser"),

@@ -42,13 +42,30 @@ class DrawerPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text(
-                            user!.username,
-                            style: TextStyle(fontSize: 20, color: Colors.white),
-                            // 添加ellipsis，防止有的人名字太长导致overflow
-                            // 注意ellipsis必须和maxLines结合使用，下同
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                user!.username,
+                                style: TextStyle(fontSize: 20, color: Colors.white),
+                                // 添加ellipsis，防止有的人名字太长导致overflow
+                                // 注意ellipsis必须和maxLines结合使用，下同
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                              SizedBox(width: 16),
+                              if (user.isBanned == true)
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Text(
+                                    '该用户被封禁',
+                                    style: TextStyle(fontSize: 10, color: Colors.white),
+                                  ),
+                                ),
+                            ]
                           ),
                           Text(
                             user.personalSlogan ?? "",

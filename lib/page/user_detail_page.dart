@@ -40,9 +40,11 @@ class _UserDetailPage extends State<UserDetailPage> {
       print('No image selected.');
     }
   }
+
   Future<File> compressToWebP(File file) async {
     final outputFilePath = file.absolute.path + "_compressed.webp";
-    final XFile? compressedImage = await FlutterImageCompress.compressAndGetFile(
+    final XFile? compressedImage =
+        await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       outputFilePath,
       format: CompressFormat.webp,
@@ -55,7 +57,6 @@ class _UserDetailPage extends State<UserDetailPage> {
       throw Exception("Image compression failed.");
     }
   }
-
 
   Future<void> uploadAvatar(File? image) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -101,7 +102,6 @@ class _UserDetailPage extends State<UserDetailPage> {
     }
   }
 
-
   Future<void> updateUserInfo() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.user;
@@ -116,7 +116,8 @@ class _UserDetailPage extends State<UserDetailPage> {
         age: int.parse(_ageController.text),
         address: _addressController.text,
         personalSlogan: _sloganController.text,
-        id: user.id);
+        id: user.id,
+        isBanned: false);
 
     // 同时更新userProvider中的user
     userProvider.setUser(tempUser);
@@ -195,6 +196,7 @@ class _UserDetailPage extends State<UserDetailPage> {
     _addressController = TextEditingController(text: user.address ?? "");
     _sloganController = TextEditingController(text: user.personalSlogan ?? "");
   }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -214,7 +216,7 @@ class _UserDetailPage extends State<UserDetailPage> {
               CircleAvatar(
                 radius: 60,
                 backgroundImage: NetworkImage(
-                  user?.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
+                    user?.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
               ),
               _image == null ? Text("") : Image.file(_image!),
               TextButton(
