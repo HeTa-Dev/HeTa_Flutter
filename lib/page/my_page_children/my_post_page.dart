@@ -18,7 +18,7 @@ class MyPostsPage extends StatefulWidget {
 class _MyPostsPageState extends State<MyPostsPage> {
   List<PostView>? postViewList;
 
-  // 异步获取订单视图
+  // 异步获取帖子视图
   Future<void> _getPostView() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.user!;

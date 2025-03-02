@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heta/page/drawer_page.dart';
+import 'package:heta/page/my_page_children/help_page.dart';
 import 'package:heta/page/my_page_children/my_post_page.dart';
 
 //这里是我的界面，其中其实只有我发布的帖子的功能，其他没有要求做。
@@ -26,18 +27,16 @@ class MyPage extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-            leading: Icon(Icons.book),
-            title: Text("我的帖子"),
-            trailing: Icon(Icons.chevron_right),
+          leading: Icon(Icons.book),
+          title: Text("我的帖子"),
+          trailing: Icon(Icons.chevron_right),
           onTap: () {
-            // 跳转到“我的账号”页面
+            // 跳转到“我的帖子”页面
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => MyPostsPage()),
             );
           },
-
-
         ),
         Divider(),
         ListTile(
@@ -53,7 +52,13 @@ class MyPage extends StatelessWidget {
         ListTile(
             leading: Icon(Icons.message),
             title: Text("帮助与反馈"),
-            trailing: Icon(Icons.chevron_right)),
+            trailing: Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HelpPage()));
+            }),
         Divider(),
       ],
     );
