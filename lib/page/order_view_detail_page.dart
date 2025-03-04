@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:heta/config/web_config.dart';
+import 'package:heta/page/user_main_page.dart';
 import 'package:http/http.dart' as http;
 
 import '../entity/order_view.dart';
@@ -49,17 +50,57 @@ class _OrderViewDetailPageState extends State<OrderViewDetailPage> {
       appBar: AppBar(
         title: seller == null
             ? CircularProgressIndicator(
-            strokeWidth: 2.5,
-        ) // 如果 seller 为空，显示加载指示器
+          strokeWidth: 2.5,
+        ) // 如果 user 为空，显示加载指示器
             : Row(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                seller!.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
+            GestureDetector(
+                onTap: () {
+                  // 点击头像后跳转到新页面
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => UserProfile(user: seller)),
+                  );
+                },
+                child: Row(children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        seller!.avatarPath ?? WebConfig.DEFAULT_IMAGE_PATH),
+                  ),
+                  SizedBox(width: 10),
+                  if (seller?.isBanned == true)
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        '该用户被封禁',
+                        style: TextStyle(fontSize: 10, color: Colors.white),
+                      ),
+                    ),
+                ])),
+            SizedBox(width: 10),
+            Text(
+              seller!.username,
+              style: TextStyle(fontSize: 12),
             ),
             SizedBox(width: 10),
-            Text(seller!.username,
-            style: TextStyle(fontSize: 12),),
+            //显示管理员标识
+            if (seller?.type == 'administrator')
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  '管理员',
+                  style: TextStyle(fontSize: 10, color: Colors.white),
+                ),
+              ),
           ],
         ),
       ),

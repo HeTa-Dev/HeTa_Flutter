@@ -49,7 +49,7 @@ class WebSocketProvider with ChangeNotifier {
   }
 
   // 根据 receiverId 获取历史消息
-  Future<void> fetchHistoricalMessages({required int senderId, required int receiverId, required bool isPrivate}) async {
+  Future<void> fetchHistoricalMessages({required int? senderId, required int? receiverId}) async {
     if (_isLoading) return;
 
     _isLoading = true;
@@ -70,12 +70,18 @@ class WebSocketProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void sendMessage(Message message) {
+  Future<void> sendMessage(Message message) async {
     // 自己发送的消息不增加未读消息数
     // 自己发送的消息应该直接插入消息列表，并更新界面
     _messages.insert(0, message);
     _unreadCount--;
     channel.sink.add(jsonEncode(message.toJson()));
+   final response1 = await http.post(
+        Uri.parse("http://" +
+            WebConfig.SERVER_HOST_ADDRESS +
+            ":8080/heta/message/saveMessage"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(message.toJson()));
   }
 
   void clearUnreadCount() {
@@ -90,7 +96,7 @@ class WebSocketProvider with ChangeNotifier {
   }
 
   // 设置当前的聊天对象 ID
-  void setCurrentReceiverId(int receiverId) {
+  void setCurrentReceiverId(int? receiverId) {
     _currentReceiverId = receiverId;
     notifyListeners();
   }

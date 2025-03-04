@@ -3,6 +3,8 @@ import 'package:heta/page/drawer_page.dart';
 import 'package:heta/page/my_page_children/help_page.dart';
 import 'package:heta/page/my_page_children/my_post_page.dart';
 
+import 'my_page_children/my_order_page.dart';
+
 //这里是我的界面，其中其实只有我发布的帖子的功能，其他没有要求做。
 //另外我并没有区分用户，和商人。并没有我的商人发布的商品的功能。
 class MyPage extends StatelessWidget {
@@ -35,6 +37,19 @@ class MyPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => MyPostsPage()),
+            );
+          },
+        ),
+        Divider(),
+        ListTile(
+          leading: Icon(Icons.book),
+          title: Text("我的商品"),
+          trailing: Icon(Icons.chevron_right),
+          onTap: () {
+            // 跳转到“我的帖子”页面
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MyOrdersPage()),
             );
           },
         ),

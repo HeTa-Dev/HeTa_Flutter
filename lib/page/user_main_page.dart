@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:heta/page/realtime_chat_page.dart';
+import 'package:heta/page/seller_orders.dart';
 import 'package:heta/page/user_posts.dart';
 import 'package:provider/provider.dart';
 
 import '../config/web_config.dart';
+import '../entity/contact.dart';
 import '../entity/user.dart';
 import '../provider/user_provider.dart';
 import 'package:http/http.dart' as http;
@@ -145,29 +150,91 @@ class UserProfile extends StatelessWidget {
             ),
             SizedBox(height: 20),*/
             Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.grey[800],
-                  backgroundColor: Colors.white.withOpacity(0.8),
-                  side: BorderSide(color: Colors.black12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 1,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => userPostsPage(user)),
-                  );
-                },
-                child:
-                    Text('查看帖子', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.grey[800],
+                        backgroundColor: Colors.white.withOpacity(0.8),
+                        side: BorderSide(color: Colors.black12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 1,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => userPostsPage(user)),
+                        );
+                      },
+                      child: Text('                           查看帖子                            ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    SizedBox(height: 10),
+                    if(currentUser?.type=="seller")
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.grey[800],
+                          backgroundColor: Colors.white.withOpacity(0.8),
+                          side: BorderSide(color: Colors.black12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          elevation: 1,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => sellerOrdersPage(user)),
+                          );
+                        },
+                        child: Text('                           查看商品                            ',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      )
+                    ,
+                    SizedBox(height:10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.grey[800],
+                        backgroundColor: Colors.white.withOpacity(0.8),
+                        side: BorderSide(color: Colors.black12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 1,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () async {
+                        Contact contact = Contact(
+                            chatter1_id: currentUser?.id,
+                            chatter2_id: user?.id,
+                            chatter1_name:currentUser?.username,
+                            chatter2_name: user?.username,
+                            chatter1_avatarPath: currentUser?.avatarPath,
+                            chatter2_avatarPath: user?.avatarPath);
+                        final response1 = await http.post(
+                            Uri.parse("http://" +
+                                WebConfig.SERVER_HOST_ADDRESS +
+                                ":8080/heta/contacts/saveContact"),
+                            headers: {"Content-Type": "application/json"},
+                            body: jsonEncode(contact.toJson()));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RealtimeChatPage(receiver_id: user?.id,)),
+                        );
+                      },
+                      child: Text('                           一起聊天                            ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                )),
           ],
         ),
       ),
