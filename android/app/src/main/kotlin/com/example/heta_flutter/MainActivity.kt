@@ -1,4 +1,4 @@
-package com.example.heta
+package com.example.heta_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 

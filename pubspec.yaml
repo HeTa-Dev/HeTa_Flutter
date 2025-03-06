@@ -47,6 +47,8 @@ dependencies:
   cupertino_icons: ^1.0.6
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.3
+  launcher_name: ^1.0.2
   flutter_test:
     sdk: flutter
 
@@ -60,6 +62,15 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.jpg"  # 你的应用图标
+  adaptive_icon_background: "#ffffff"  # 仅适用于 Android 8.0+
+  adaptive_icon_foreground: "assets/icon.jpg"
+
+launcher_name:
+  default: "禾她"
 # The following section is specific to Flutter packages.
 flutter:
 

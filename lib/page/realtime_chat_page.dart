@@ -39,14 +39,21 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
         final Map<String, dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         setState(() {
           receiver = User.fromJson(jsonData);
-          isLoading = false; // 数据加载完成
+          isLoading = false;
         });
+        // 在 receiver 赋值后再调用 fetchHistoricalMessages
+        final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        webSocketProvider.fetchHistoricalMessages(
+          senderId: userProvider.user?.id ?? 0,
+          receiverId: receiver?.id, // 此时 receiver.id 已经有值
+        );
       } else {
         throw Exception('Failed to load user');
       }
     } catch (e) {
       setState(() {
-        isLoading = false; // 加载失败
+        isLoading = false;
       });
       print('Error loading receiver: $e');
     }
@@ -59,14 +66,8 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
     _loadReceiver();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
       webSocketProvider.clearMessages();
-      webSocketProvider.setCurrentReceiverId(receiver?.id);
-      webSocketProvider.fetchHistoricalMessages(
-        senderId: userProvider.user?.id ?? 0,
-        receiverId: receiver?.id,
-        //isPrivate: true, // 只加载私信消息
-      );
+      webSocketProvider.setCurrentReceiverId(widget.receiver_id);
       webSocketProvider.clearUnreadCount(); // 清除未读消息计数
     });
   }
@@ -115,7 +116,6 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
                     }
 
                     final message = messages[index];
-                    if (message.receiverId == receiver?.id ) {
                       return ChatBubble(
                         timestamp: message.timestamp ?? DateTime.now(),
                         message: message.content,
@@ -123,9 +123,6 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
                         senderName: message.senderName,
                         avatarPath: message.senderAvatarPath,
                       );
-                    } else {
-                      return SizedBox.shrink(); // 如果不是当前接收者的私信，则不显示
-                    }
                   },
                 ),
               ),
@@ -142,7 +139,9 @@ class _RealtimeChatPageState extends State<RealtimeChatPage> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _sendMessage(_messageController.text);
+                    setState(() {
+                      _sendMessage(_messageController.text);
+                    });
                   },
                   icon: Icon(Icons.arrow_forward),
                 ),

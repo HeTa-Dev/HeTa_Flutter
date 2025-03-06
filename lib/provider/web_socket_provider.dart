@@ -28,20 +28,23 @@ class WebSocketProvider with ChangeNotifier {
     _listenToMessages();
   }
 
+  // 监听 WebSocket 消息
   void _listenToMessages() {
     channel.stream.listen((data) {
       final Map<String, dynamic> json = jsonDecode(data);
       final message = Message.fromJson(json);
-
-      // 检查消息的接收者是否是当前用户的聊天对象
-      if (message.receiverId == getCurrentReceiverId()) {
+      // 检查消息的发送者是否是当前用户的聊天对象
+      if (message.senderId == getCurrentReceiverId()) {
         _messages.insert(0, message);
       }
       _unreadCount++;
       notifyListeners();
+    }, onError: (error) {
+    }, onDone: () {
     });
   }
 
+  // 清空消息列表
   void clearMessages() {
     _messages.clear();
     _page = 0; // 重置分页
@@ -57,33 +60,28 @@ class WebSocketProvider with ChangeNotifier {
 
     final response = await http.get(Uri.parse(
         'http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/messages/getMessageById/$senderId/$receiverId/${_page * _pageSize}/$_pageSize'));
-
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
-      _messages.addAll(data.map((json) => Message.fromJson(json)).toList());
+      final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));_messages.addAll(data.map((json) => Message.fromJson(json)).toList());
       _page++;
-    } else {
-      print('Failed to load historical messages');
     }
-
     _isLoading = false;
     notifyListeners();
   }
 
+  // 发送消息
   Future<void> sendMessage(Message message) async {
-    // 自己发送的消息不增加未读消息数
-    // 自己发送的消息应该直接插入消息列表，并更新界面
     _messages.insert(0, message);
     _unreadCount--;
     channel.sink.add(jsonEncode(message.toJson()));
-   final response1 = await http.post(
-        Uri.parse("http://" +
-            WebConfig.SERVER_HOST_ADDRESS +
-            ":8080/heta/message/saveMessage"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(message.toJson()));
+
+    final response1 = await http.post(
+      Uri.parse("http://${WebConfig.SERVER_HOST_ADDRESS}:8080/heta/message/saveMessage"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(message.toJson()),
+    );
   }
 
+  // 清空未读消息计数
   void clearUnreadCount() {
     _unreadCount = 0;
     notifyListeners();
@@ -101,6 +99,7 @@ class WebSocketProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // 获取当前聊天对象的 ID
   int getCurrentReceiverId() {
     return _currentReceiverId ?? 0; // 返回当前的 receiverId
   }
